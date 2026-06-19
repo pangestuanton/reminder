@@ -7,59 +7,94 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## About Aviona Sync
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aviona Sync adalah aplikasi manajemen jadwal kegiatan dengan integrasi Google Login, pengingat via email dan WhatsApp (Fonnte).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Deployment ke Railway
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Persiapan
 
-## Learning Laravel
+1. Buat akun di [Railway](https://railway.app)
+2. Buat project baru dan connect ke GitHub repo ini
+3. Tambahkan service **PostgreSQL** di Railway dashboard
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Environment Variables
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Set variabel berikut di Railway dashboard (Settings > Variables):
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+APP_NAME="Aviona Sync"
+APP_ENV=production
+APP_KEY=base64:your-generated-key
+APP_DEBUG=false
+APP_URL=https://your-app-name.up.railway.app
+APP_TIMEZONE=Asia/Jakarta
+APP_LOCALE=id
 
-## Laravel Sponsors
+DB_CONNECTION=pgsql
+DB_HOST=your-railway-db-host
+DB_PORT=5432
+DB_DATABASE=your-railway-db-name
+DB_USERNAME=your-railway-db-username
+DB_PASSWORD=your-railway-db-password
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+SESSION_DRIVER=database
+CACHE_STORE=database
+QUEUE_CONNECTION=database
 
-### Premium Partners
+MAIL_MAILER=log
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="your-email@gmail.com"
+MAIL_FROM_NAME="${APP_NAME}"
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=https://your-app-name.up.railway.app/auth/google/callback
 
-## Contributing
+FONNTE_ENABLED=true
+FONNTE_TOKEN=your-fonnte-token
+FONNTE_BASE_URL=https://api.fonnte.com
+FONNTE_TEST_TARGET=your-whatsapp-number
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+> **Tip:** Di Railway, variabel `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` otomatis tersedia jika kamu pakai PostgreSQL plugin Railway. Gunakan `${{PostgreSQL.DATABASE_URL}}` atau set manual.
 
-## Code of Conduct
+### Build & Start Command
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Railway otomatis menggunakan Nixpacks untuk mendeteksi PHP + Node.js. Build process:
 
-## Security Vulnerabilities
+1. `composer install --no-dev --optimize-autoloader`
+2. `npm install && npm run build`
+3. Start: `php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && php -S 0.0.0.0:$PORT -t public`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Worker Service (Scheduler)
+
+Tambahkan service kedua di Railway dengan command:
+
+```
+php artisan schedule:work
+```
+
+Ini menjalankan scheduler untuk mengirim pengingat H-3 dan H-1 via email + WhatsApp.
+
+### Setup Lokal
+
+```bash
+git clone https://github.com/pangestuanton/reminder.git
+cd reminder
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm install
+npm run build
+php artisan serve
+```
 
 ## License
 
