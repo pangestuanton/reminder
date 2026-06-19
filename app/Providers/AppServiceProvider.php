@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Providers;
+
+use App\Models\JadwalKegiatan;
+use App\Policies\JadwalKegiatanPolicy;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function register(): void {}
+
+    public function boot(): void
+    {
+        Gate::policy(JadwalKegiatan::class, JadwalKegiatanPolicy::class);
+
+        Carbon::setLocale(config('app.locale'));
+        date_default_timezone_set(config('app.timezone'));
+    }
+}
