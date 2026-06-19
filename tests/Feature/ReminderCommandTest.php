@@ -47,4 +47,41 @@ class ReminderCommandTest extends TestCase
 
         $this->assertDatabaseCount('reminder_logs', 0);
     }
+
+    public function test_3h_countdown_reminders_are_sent_every_30_minutes(): void
+    {
+        Notification::fake();
+        Http::fake(['*' => Http::response(['status' => true], 200)]);
+
+        config()->set('services.fonnte.enabled', true);
+        config()->set('services.fonnte.token', 'token-test');
+
+        $user = User::factory()->create(['whatsapp_number' => '081234567890']);
+        
+        $schedule = JadwalKegiatan::factory()->for($user)->create([
+            'waktu_pelaksanaan' => now()->addMinutes(165),
+            'status' => 'pending',
+        ]);
+
+        $this->artisan('aviona:send-schedule-reminders')->assertSuccessful();
+        $this->assertDatabaseHas('reminder_logs', [
+            'jadwal_kegiatan_id' => $schedule->id,
+            'reminder_type' => '3h_slot_6',
+        ]);
+        $this->assertDatabaseCount('reminder_logs', 2);
+
+        $this->artisan('aviona:send-schedule-reminders')->assertSuccessful();
+        $this->assertDatabaseCount('reminder_logs', 2);
+
+        \Illuminate\Support\Carbon::setTestNow(now()->addMinutes(30));
+
+        $this->artisan('aviona:send-schedule-reminders')->assertSuccessful();
+        $this->assertDatabaseHas('reminder_logs', [
+            'jadwal_kegiatan_id' => $schedule->id,
+            'reminder_type' => '3h_slot_5',
+        ]);
+        $this->assertDatabaseCount('reminder_logs', 4);
+
+        \Illuminate\Support\Carbon::setTestNow();
+    }
 }

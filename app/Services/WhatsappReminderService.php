@@ -57,6 +57,28 @@ class WhatsappReminderService
 
     protected function buildMessage(User $user, JadwalKegiatan $jadwalKegiatan, string $type): string
     {
+        if (str_starts_with($type, '3h_slot_')) {
+            $minutes = now()->diffInMinutes($jadwalKegiatan->waktu_pelaksanaan, false);
+            if ($minutes < 0) {
+                $minutes = 0;
+            }
+
+            if ($minutes >= 60) {
+                $hours = floor($minutes / 60);
+                $remMins = $minutes % 60;
+                $timeString = $hours . ' jam' . ($remMins > 0 ? ' ' . $remMins . ' menit' : '');
+            } else {
+                $timeString = $minutes . ' menit';
+            }
+
+            return "Halo {$user->name},\n\n"
+                ."Ini pengingat menjelang pelaksanaan ({$timeString} lagi) dari Aviona Sync.\n"
+                ."Judul: {$jadwalKegiatan->judul}\n"
+                .'Kategori: '.ucfirst($jadwalKegiatan->kategori)."\n"
+                .'Waktu: '.$jadwalKegiatan->waktu_pelaksanaan->translatedFormat('l, d F Y • H.i')."\n\n"
+                .'Segera bersiap-siap ya.';
+        }
+
         $label = $type === 'h3' ? 'H-3' : 'H-1';
 
         return "Halo {$user->name},\n\n"

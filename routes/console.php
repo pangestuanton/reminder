@@ -2,4 +2,4 @@
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('aviona:send-schedule-reminders')->hourly();
+Schedule::command('aviona:send-schedule-reminders')->everyFiveMinutes();
