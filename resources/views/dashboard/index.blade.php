@@ -59,7 +59,7 @@
     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <x-card>
             <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-slate-900">Progres Mingguan</h3>
+                <h3 class="text-sm font-semibold text-slate-900">Progres Keseluruhan</h3>
                 <span class="text-2xl font-bold text-blue-600">{{ $analytics['percentage'] }}%</span>
             </div>
             <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
