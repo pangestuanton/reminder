@@ -49,7 +49,7 @@
                 @endif
                 <div>
                     <dt class="text-sm font-medium text-slate-500">Lokasi / Link</dt>
-                    <dd class="mt-1 text-base text-slate-900">{{ $jadwalKegiatan->lokasi_atau_link ?: 'Belum diisi' }}</dd>
+                    <dd class="mt-1 text-base text-slate-900 break-all">{{ $jadwalKegiatan->lokasi_atau_link ?: 'Belum diisi' }}</dd>
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-slate-500">Sumber</dt>
@@ -58,7 +58,7 @@
                 @if ($jadwalKegiatan->deskripsi)
                     <div class="md:col-span-2">
                         <dt class="text-sm font-medium text-slate-500">Deskripsi</dt>
-                        <dd class="mt-1 text-base leading-relaxed text-slate-900">{{ $jadwalKegiatan->deskripsi }}</dd>
+                        <dd class="mt-1 text-base leading-relaxed text-slate-900 break-words whitespace-pre-line">{{ $jadwalKegiatan->deskripsi }}</dd>
                     </div>
                 @endif
                 <div>

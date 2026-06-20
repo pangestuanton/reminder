@@ -95,7 +95,7 @@
                                 <p class="mt-0.5 text-xs text-slate-400">{{ $jadwal->course_name }}</p>
                             @endif
                             @if ($jadwal->lokasi_atau_link)
-                                <p class="mt-1 text-sm text-slate-500">{{ $jadwal->lokasi_atau_link }}</p>
+                                <p class="mt-1 text-sm text-slate-500 break-all">{{ $jadwal->lokasi_atau_link }}</p>
                             @endif
                             @if ($jadwal->countdown_text)
                                 <p class="mt-2 text-sm font-medium {{ $jadwal->isOverdue() ? 'text-red-600' : 'text-blue-600' }}">

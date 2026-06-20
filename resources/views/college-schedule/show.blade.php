@@ -31,7 +31,7 @@
                 @endif
 
                 @if ($schedule->lokasi)
-                    <div class="text-sm text-slate-600"><span class="font-medium">Lokasi:</span> {{ $schedule->lokasi }}</div>
+                    <div class="text-sm text-slate-600 break-all"><span class="font-medium">Lokasi:</span> {{ $schedule->lokasi }}</div>
                 @endif
 
                 @if ($schedule->catatan)
