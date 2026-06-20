@@ -134,7 +134,7 @@ class DailyAgendaService
             $lines[] = '───────────────';
             foreach ($overdue as $task) {
                 $totalItems++;
-                $daysOverdue = abs(now()->diffInDays($task->waktu_pelaksanaan, false));
+                $daysOverdue = (int) round(abs(now()->diffInDays($task->waktu_pelaksanaan, false)));
                 $lines[] = "• {$this->messageService->escapeMarkdown($task->judul)} ({$daysOverdue} hari terlambat)";
                 $lines[] = '';
             }

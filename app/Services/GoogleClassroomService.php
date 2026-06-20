@@ -243,7 +243,7 @@ class GoogleClassroomService
 
     protected function calculatePriority(Carbon $dueDateTime): string
     {
-        $daysUntil = now()->diffInDays($dueDateTime, false);
+        $daysUntil = (int) now()->diffInDays($dueDateTime, false);
 
         if ($daysUntil < 0) {
             return 'tinggi';

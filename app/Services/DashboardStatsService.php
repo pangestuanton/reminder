@@ -32,19 +32,19 @@ class DashboardStatsService
             return 'Tenggat sudah terlewat.';
         }
 
-        $diffInMinutes = now()->diffInMinutes($jadwalKegiatan->waktu_pelaksanaan, false);
+        $diffInMinutes = (int) round(now()->diffInMinutes($jadwalKegiatan->waktu_pelaksanaan, false));
 
         if ($diffInMinutes < 60) {
             return 'Dimulai dalam kurang dari 1 jam.';
         }
 
-        $diffInHours = now()->diffInHours($jadwalKegiatan->waktu_pelaksanaan, false);
+        $diffInHours = (int) round(now()->diffInHours($jadwalKegiatan->waktu_pelaksanaan, false));
 
         if ($diffInHours < 24) {
             return 'Tenggat dalam '.$diffInHours.' jam.';
         }
 
-        $diffInDays = now()->diffInDays($jadwalKegiatan->waktu_pelaksanaan, false);
+        $diffInDays = (int) round(now()->diffInDays($jadwalKegiatan->waktu_pelaksanaan, false));
 
         return 'Tenggat dalam '.$diffInDays.' hari.';
     }

@@ -1,5 +1,5 @@
 @php
-    $daysLeft = $work->due_date ? now()->startOfDay()->diffInDays($work->due_date->startOfDay(), false) : null;
+    $daysLeft = $work->due_date ? (int) now()->startOfDay()->diffInDays($work->due_date->startOfDay(), false) : null;
 @endphp
 
 <x-card>
