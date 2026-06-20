@@ -23,6 +23,8 @@ Route::get('/', function () {
         : redirect()->route('login');
 })->name('home');
 
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
@@ -31,7 +33,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
 
     Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
-    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 });
 
 Route::middleware('auth')->group(function () {
@@ -97,7 +98,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/integrations', [IntegrationsController::class, 'index'])->name('integrations.index');
     Route::get('/integrations/google/{service}', [IntegrationsController::class, 'connectGoogle'])->name('integrations.google.connect');
-    Route::get('/integrations/google/callback', [IntegrationsController::class, 'googleCallback'])->name('integrations.google.callback');
     Route::post('/integrations/google/disconnect', [IntegrationsController::class, 'disconnectGoogle'])->name('integrations.google.disconnect');
 
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');

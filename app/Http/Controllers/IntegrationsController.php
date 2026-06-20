@@ -60,52 +60,8 @@ class IntegrationsController extends Controller
         return Socialite::driver('google')
             ->stateless()
             ->scopes($scopes)
-            ->redirectUrl(route('integrations.google.callback'))
+            ->redirectUrl(route('google.callback'))
             ->redirect();
-    }
-
-    public function googleCallback(Request $request, GoogleTokenService $tokenService): RedirectResponse
-    {
-        try {
-            $service = session('google_integration_service', 'all');
-            $scopes = session('google_integration_scopes', []);
-            $user = $request->user();
-
-            $socialiteUser = Socialite::driver('google')
-                ->stateless()
-                ->redirectUrl(route('integrations.google.callback'))
-                ->user();
-
-            $account = $tokenService->storeTokens($user, [
-                'access_token' => $socialiteUser->token,
-                'refresh_token' => $socialiteUser->refreshToken,
-                'expires_in' => $socialiteUser->expiresIn,
-                'email' => $socialiteUser->getEmail(),
-            ], $scopes);
-
-            if (in_array('classroom', [$service, 'all'], true)) {
-                $account->update(['classroom_connected_at' => now()]);
-                SyncGoogleClassroomJob::dispatch($user);
-            }
-
-            if (in_array('calendar', [$service, 'all'], true)) {
-                $account->update(['calendar_connected_at' => now()]);
-                SyncGoogleCalendarJob::dispatch($user);
-            }
-
-            session()->forget(['google_integration_service', 'google_integration_scopes']);
-
-            return redirect()->route('integrations.index')
-                ->with('success', 'Google berhasil dihubungkan. Sinkronisasi sedang berjalan.');
-        } catch (\Throwable $e) {
-            Log::error('Google integration callback failed', [
-                'user_id' => $request->user()->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return redirect()->route('integrations.index')
-                ->with('error', 'Gagal menghubungkan Google. Silakan coba lagi.');
-        }
     }
 
     public function disconnectGoogle(Request $request, GoogleTokenService $tokenService): RedirectResponse

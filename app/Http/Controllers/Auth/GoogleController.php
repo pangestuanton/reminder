@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
+use App\Services\GoogleTokenService;
+use App\Jobs\SyncGoogleClassroomJob;
+use App\Jobs\SyncGoogleCalendarJob;
+
 class GoogleController extends Controller
 {
     protected function driver()
@@ -27,9 +31,39 @@ class GoogleController extends Controller
         return $this->driver()->redirect();
     }
 
-    public function callback(): RedirectResponse
+    public function callback(GoogleTokenService $tokenService): RedirectResponse
     {
         try {
+            if (Auth::check()) {
+                $user = Auth::user();
+                $service = session('google_integration_service', 'all');
+                $scopes = session('google_integration_scopes', []);
+
+                $googleUser = $this->driver()->user();
+
+                $account = $tokenService->storeTokens($user, [
+                    'access_token' => $googleUser->token,
+                    'refresh_token' => $googleUser->refreshToken,
+                    'expires_in' => $googleUser->expiresIn,
+                    'email' => $googleUser->getEmail(),
+                ], $scopes);
+
+                if (in_array('classroom', [$service, 'all'], true)) {
+                    $account->update(['classroom_connected_at' => now()]);
+                    SyncGoogleClassroomJob::dispatch($user);
+                }
+
+                if (in_array('calendar', [$service, 'all'], true)) {
+                    $account->update(['calendar_connected_at' => now()]);
+                    SyncGoogleCalendarJob::dispatch($user);
+                }
+
+                session()->forget(['google_integration_service', 'google_integration_scopes']);
+
+                return redirect()->route('integrations.index')
+                    ->with('success', 'Google berhasil dihubungkan. Sinkronisasi sedang berjalan.');
+            }
+
             $googleUser = $this->driver()->user();
 
             $user = User::where('google_id', $googleUser->getId())
@@ -60,11 +94,16 @@ class GoogleController extends Controller
 
             return redirect()->route('dashboard')->with('success', 'Berhasil masuk dengan Google.');
         } catch (\Throwable $e) {
-            Log::error('Google login gagal', [
+            Log::error('Google login/integration gagal', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
+
+            if (Auth::check()) {
+                return redirect()->route('integrations.index')
+                    ->with('error', 'Gagal menghubungkan Google. Silakan coba lagi.');
+            }
 
             return redirect()->route('login')->with('error', 'Gagal masuk dengan Google. Silakan coba lagi.');
         }
