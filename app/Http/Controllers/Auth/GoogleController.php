@@ -21,14 +21,16 @@ class GoogleController extends Controller
     protected function driver()
     {
         return Socialite::driver('google')
-            ->stateless()
             ->redirectUrl(route('google.callback'))
             ->setHttpClient(new Client(['verify' => false]));
     }
 
     public function redirect(): RedirectResponse
     {
-        return $this->driver()->redirect();
+        return $this->driver()
+            ->scopes(['openid', 'email', 'profile'])
+            ->with(['access_type' => 'offline', 'prompt' => 'select_account'])
+            ->redirect();
     }
 
     public function callback(GoogleTokenService $tokenService): RedirectResponse

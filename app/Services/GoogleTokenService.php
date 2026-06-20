@@ -62,7 +62,7 @@ class GoogleTokenService
 
     public function storeTokens(User $user, array $tokenData, array $scopes): GoogleAccount
     {
-        $accessToken = $tokenData['access_token'] ?? $tokenData->getToken();
+        $accessToken = $tokenData['access_token'] ?? null;
         $refreshToken = $tokenData['refresh_token'] ?? null;
         $expiresIn = $tokenData['expires_in'] ?? 3600;
         $email = $tokenData['email'] ?? null;
@@ -73,16 +73,29 @@ class GoogleTokenService
             $expiresIn = $tokenData->expiresIn ?? 3600;
         }
 
+        // Get existing account to preserve refresh_token if Google didn't return a new one
+        $existing = GoogleAccount::where('user_id', $user->id)->first();
+
+        $updateData = [
+            'google_account_email'   => $email ?? $user->email,
+            'access_token_encrypted' => Crypt::encryptString($accessToken),
+            'token_expires_at'       => now()->addSeconds($expiresIn),
+            'scopes'                 => $scopes,
+            'disconnected_at'        => null,
+        ];
+
+        // Only update refresh_token if we got a new one from Google
+        if ($refreshToken) {
+            $updateData['refresh_token_encrypted'] = Crypt::encryptString($refreshToken);
+        } elseif (! $existing || ! $existing->refresh_token_encrypted) {
+            // If no existing refresh token either, store empty (will force re-auth)
+            $updateData['refresh_token_encrypted'] = Crypt::encryptString('');
+        }
+        // else: keep existing refresh_token_encrypted as-is
+
         return GoogleAccount::updateOrCreate(
             ['user_id' => $user->id],
-            [
-                'google_account_email' => $email ?? $user->email,
-                'access_token_encrypted' => Crypt::encryptString($accessToken),
-                'refresh_token_encrypted' => Crypt::encryptString($refreshToken),
-                'token_expires_at' => now()->addSeconds($expiresIn),
-                'scopes' => $scopes,
-                'disconnected_at' => null,
-            ]
+            $updateData
         );
     }
 

@@ -58,8 +58,11 @@ class IntegrationsController extends Controller
         session([$sessionKey => $service, $sessionKeyScopes => $scopes]);
 
         return Socialite::driver('google')
-            ->stateless()
             ->scopes($scopes)
+            ->with([
+                'access_type' => 'offline',
+                'prompt'      => 'consent',
+            ])
             ->redirectUrl(route('google.callback'))
             ->redirect();
     }

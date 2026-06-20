@@ -14,11 +14,11 @@ class ClassroomController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        $courses = GoogleClassroomCourse::ownedBy($user)->active()->get();
+        $courses = GoogleClassroomCourse::ownedBy($user)->active()->with('courseWorks')->get();
 
         $courseWorks = GoogleClassroomCourseWork::ownedBy($user)
             ->with('course')
-            ->orderBy('due_date', 'desc')
+            ->orderBy('due_date', 'asc')
             ->get();
 
         return view('classroom.index', compact('courses', 'courseWorks'));
