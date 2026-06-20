@@ -73,14 +73,18 @@ class GoogleTokenService
             $expiresIn = $tokenData->expiresIn ?? 3600;
         }
 
-        // Get existing account to preserve refresh_token if Google didn't return a new one
+        // Get existing account to preserve refresh_token and merge scopes
         $existing = GoogleAccount::where('user_id', $user->id)->first();
+
+        // Merge new scopes with existing ones — never shrink the granted scope set
+        $existingScopes = $existing?->scopes ?? [];
+        $mergedScopes = array_values(array_unique(array_merge($existingScopes, $scopes)));
 
         $updateData = [
             'google_account_email'   => $email ?? $user->email,
             'access_token_encrypted' => Crypt::encryptString($accessToken),
             'token_expires_at'       => now()->addSeconds($expiresIn),
-            'scopes'                 => $scopes,
+            'scopes'                 => $mergedScopes,
             'disconnected_at'        => null,
         ];
 
@@ -88,7 +92,6 @@ class GoogleTokenService
         if ($refreshToken) {
             $updateData['refresh_token_encrypted'] = Crypt::encryptString($refreshToken);
         } elseif (! $existing || ! $existing->refresh_token_encrypted) {
-            // If no existing refresh token either, store empty (will force re-auth)
             $updateData['refresh_token_encrypted'] = Crypt::encryptString('');
         }
         // else: keep existing refresh_token_encrypted as-is

@@ -178,5 +178,34 @@ Route::middleware('auth')->group(function () {
 
         return response()->json($output, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     })->name('debug.classroom');
-});
 
+    // Force-sync classroom synchronously (no queue) — for Railway debugging
+    Route::get('/debug/classroom/sync', function (\App\Services\GoogleClassroomService $classroomService) {
+        $user = auth()->user();
+        $output = ['user_id' => $user->id, 'steps' => []];
+
+        if (! $user->hasClassroomAccess()) {
+            $output['error'] = 'Classroom not connected. classroom_connected_at is null or disconnected.';
+            return response()->json($output, 200, [], JSON_PRETTY_PRINT);
+        }
+
+        // Step 1: sync courses
+        $courseResult = $classroomService->syncCourses($user);
+        $output['steps'][] = ['sync_courses' => $courseResult];
+
+        if (isset($courseResult['error'])) {
+            $output['error'] = $courseResult['error'];
+            return response()->json($output, 200, [], JSON_PRETTY_PRINT);
+        }
+
+        // Step 2: sync course works
+        $workResult = $classroomService->syncCourseWork($user);
+        $output['steps'][] = ['sync_course_works' => $workResult];
+
+        $output['db_courses_count']      = \App\Models\GoogleClassroomCourse::ownedBy($user)->count();
+        $output['db_course_works_count'] = \App\Models\GoogleClassroomCourseWork::ownedBy($user)->count();
+        $output['message'] = 'Sync complete. Refresh /classroom to see your tasks.';
+
+        return response()->json($output, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    })->name('debug.classroom.sync');
+});

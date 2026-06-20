@@ -30,7 +30,7 @@ class IntegrationsController extends Controller
 
     public function connectGoogle(Request $request, string $service): RedirectResponse
     {
-        $scopes = match ($service) {
+        $serviceScopes = match ($service) {
             'classroom' => [
                 'https://www.googleapis.com/auth/classroom.courses.readonly',
                 'https://www.googleapis.com/auth/classroom.coursework.me.readonly',
@@ -53,9 +53,16 @@ class IntegrationsController extends Controller
             ],
         };
 
-        $sessionKey = 'google_integration_service';
-        $sessionKeyScopes = 'google_integration_scopes';
-        session([$sessionKey => $service, $sessionKeyScopes => $scopes]);
+        // Merge with any scopes the user has already granted, so connecting
+        // a second service doesn't revoke access to the first one.
+        $user = $request->user();
+        $existingScopes = $user->googleAccount?->scopes ?? [];
+        $scopes = array_values(array_unique(array_merge($existingScopes, $serviceScopes)));
+
+        session([
+            'google_integration_service'        => $service,
+            'google_integration_scopes'         => $scopes,
+        ]);
 
         return Socialite::driver('google')
             ->scopes($scopes)
