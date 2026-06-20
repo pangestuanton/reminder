@@ -157,27 +157,32 @@ class TelegramMessageService
         $key = "{$category}_{$stage}";
         $template = $this->pickTemplate($key, $jadwal, $minutesRemaining);
 
-        $lines = explode("\n", $template);
-        $lines[] = '';
-        $lines[] = "📌 {$this->escapeMarkdown($jadwal->judul)}";
+        $lines = [];
+        $lines[] = $template;
+        $lines[] = "";
+        $lines[] = "📌 <b>" . $this->escapeHtml($jadwal->judul) . "</b>";
 
         if ($jadwal->course_name) {
-            $lines[] = "📚 {$this->escapeMarkdown($jadwal->course_name)}";
+            $lines[] = "📚 <b>" . $this->escapeHtml($jadwal->course_name) . "</b>";
         }
 
         $deadline = $jadwal->getEffectiveDeadline();
-        $lines[] = "🕐 {$deadline->translatedFormat('l, d F Y \\- H.i')}";
+        if ($deadline) {
+            $lines[] = "🕐 " . $deadline->translatedFormat('l, d F Y - H.i');
+        } else {
+            $lines[] = "🕐 Tanpa deadline";
+        }
 
         if ($jadwal->lokasi_atau_link) {
             if (filter_var($jadwal->lokasi_atau_link, FILTER_VALIDATE_URL)) {
-                $lines[] = "🔗 Link: {$this->escapeMarkdown($jadwal->lokasi_atau_link)}";
+                $lines[] = "🔗 <a href=\"" . $this->escapeHtml($jadwal->lokasi_atau_link) . "\">Buka Tautan</a>";
             } else {
-                $lines[] = "📍 {$this->escapeMarkdown($jadwal->lokasi_atau_link)}";
+                $lines[] = "📍 " . $this->escapeHtml($jadwal->lokasi_atau_link);
             }
         }
 
-        $lines[] = '⚠️ Prioritas: '.ucfirst($jadwal->prioritas);
-        $lines[] = "Sumber: {$jadwal->source_label}";
+        $lines[] = "⚠️ Prioritas: " . ucfirst($jadwal->prioritas);
+        $lines[] = "Sumber: " . $jadwal->source_label;
 
         if ($minutesRemaining !== null && $minutesRemaining > 0) {
             $remaining = $this->formatRemainingTime($minutesRemaining);
@@ -189,7 +194,7 @@ class TelegramMessageService
 
     protected function pickTemplate(string $key, JadwalKegiatan $jadwal, ?int $minutesRemaining = null): string
     {
-        $title = $this->escapeMarkdown($jadwal->judul);
+        $title = $this->escapeHtml($jadwal->judul);
         $remaining = $minutesRemaining ? $this->formatRemainingTime($minutesRemaining) : '';
 
         $templates = match ($key) {
@@ -363,5 +368,10 @@ class TelegramMessageService
         }
 
         return $text;
+    }
+
+    public function escapeHtml(string $text): string
+    {
+        return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8');
     }
 }

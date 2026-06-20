@@ -53,4 +53,21 @@ class TelegramMessageServiceTest extends TestCase
         $this->assertStringContainsString('Pemrograman Web', $message);
         $this->assertStringContainsString('Dr\. Budi', $message);
     }
+
+    public function test_build_reminder_message_uses_html_formatting(): void
+    {
+        $user = User::factory()->create();
+        $jadwal = JadwalKegiatan::factory()->for($user)->create([
+            'judul' => 'Ujian Akhir Semester (UAS) Agama Islam',
+            'course_name' => 'R2 Agama Islam 2026',
+        ]);
+
+        $service = app(TelegramMessageService::class);
+        $message = $service->buildReminderMessage($jadwal, 'h1');
+
+        $this->assertStringContainsString('📌 <b>Ujian Akhir Semester (UAS) Agama Islam</b>', $message);
+        $this->assertStringContainsString('📚 <b>R2 Agama Islam 2026</b>', $message);
+        $this->assertStringNotContainsString('\(', $message);
+        $this->assertStringNotContainsString('\.', $message);
+    }
 }

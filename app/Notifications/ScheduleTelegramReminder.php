@@ -35,7 +35,7 @@ class ScheduleTelegramReminder extends Notification
 
         return TelegramMessage::create()
             ->content($content)
-            ->options(['parse_mode' => 'Markdown'])
+            ->options(['parse_mode' => 'HTML'])
             ->button('Lihat Tugas', route('jadwal-kegiatan.show', $this->schedule));
     }
 }
