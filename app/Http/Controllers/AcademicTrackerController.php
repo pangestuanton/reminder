@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseGrade;
+use App\Services\AnalyticsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AcademicTrackerController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, AnalyticsService $analyticsService): View
     {
         $user = $request->user();
         $grades = CourseGrade::where('user_id', $user->id)
@@ -97,7 +98,20 @@ class AcademicTrackerController extends Controller
             }
         }
 
+        // Calculate Analytics stats
+        $stats = $analyticsService->getStats(
+            $user,
+            $request->input('date_from'),
+            $request->input('date_to'),
+            $request->input('course'),
+            $request->input('category'),
+            $request->input('source'),
+        );
+
+        $courses = $analyticsService->getUserCourses($user);
+
         return view('academic-tracker.index', [
+            // Academic Tracker data
             'semesterStats' => $semesterStats,
             'cumulativeSks' => $cumulativeSks,
             'ipk' => $ipk,
@@ -107,6 +121,11 @@ class AcademicTrackerController extends Controller
             'chartWidth' => $width,
             'chartHeight' => $height,
             'chartPadding' => $padding,
+
+            // Analytics data
+            ...$stats,
+            'courses' => $courses,
+            'filters' => $request->only(['date_from', 'date_to', 'course', 'category', 'source']),
         ]);
     }
 

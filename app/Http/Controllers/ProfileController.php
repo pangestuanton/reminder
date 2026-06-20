@@ -9,10 +9,13 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function edit(): View
+    public function edit(Request $request): View
     {
+        $user = $request->user();
         return view('profile.edit', [
-            'user' => auth()->user(),
+            'user' => $user,
+            'hasClassroom' => $user->hasClassroomAccess(),
+            'hasCalendar' => $user->hasCalendarAccess(),
         ]);
     }
 

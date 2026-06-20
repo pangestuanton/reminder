@@ -15,7 +15,7 @@ class AnalyticsPageTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route('analytics.index'))->assertOk();
+        $this->actingAs($user)->get(route('academic-tracker.index', ['tab' => 'analitik']))->assertOk();
     }
 
     public function test_analytics_shows_stats(): void
@@ -24,7 +24,7 @@ class AnalyticsPageTest extends TestCase
         JadwalKegiatan::factory()->for($user)->pending()->count(3)->create();
         JadwalKegiatan::factory()->for($user)->selesai()->create();
 
-        $response = $this->actingAs($user)->get(route('analytics.index'));
+        $response = $this->actingAs($user)->get(route('academic-tracker.index', ['tab' => 'analitik']));
         $response->assertOk();
         $response->assertSee('4');
         $response->assertSee('25');
@@ -36,7 +36,7 @@ class AnalyticsPageTest extends TestCase
         JadwalKegiatan::factory()->for($user)->create(['kategori' => 'tugas']);
         JadwalKegiatan::factory()->for($user)->create(['kategori' => 'uts']);
 
-        $response = $this->actingAs($user)->get(route('analytics.index', ['category' => 'tugas']));
+        $response = $this->actingAs($user)->get(route('academic-tracker.index', ['tab' => 'analitik', 'category' => 'tugas']));
         $response->assertOk();
         $response->assertSee('50');
     }

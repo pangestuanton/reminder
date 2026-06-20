@@ -16,9 +16,7 @@
                 <a href="{{ route('jadwal-kegiatan.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Tugas</a>
                 <a href="{{ route('college-schedule.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Jadkul</a>
                 <a href="{{ route('calendar.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Kalender</a>
-                <a href="{{ route('analytics.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Analitik</a>
                 <a href="{{ route('academic-tracker.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Akademik</a>
-                <a href="{{ route('integrations.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Integrasi</a>
                 <div class="mx-1 h-5 w-px bg-slate-200"></div>
                 <a href="{{ route('profile.edit') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Profil</a>
                 <a href="{{ route('settings.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Pengaturan</a>
@@ -40,9 +38,7 @@
                 <a href="{{ route('jadwal-kegiatan.index') }}" class="block rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">Tugas</a>
                 <a href="{{ route('college-schedule.index') }}" class="block rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">Jadkul</a>
                 <a href="{{ route('calendar.index') }}" class="block rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">Kalender</a>
-                <a href="{{ route('analytics.index') }}" class="block rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">Analitik</a>
                 <a href="{{ route('academic-tracker.index') }}" class="block rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">Akademik</a>
-                <a href="{{ route('integrations.index') }}" class="block rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">Integrasi</a>
                 <a href="{{ route('profile.edit') }}" class="block rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">Profil</a>
                 <a href="{{ route('settings.index') }}" class="block rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700">Pengaturan</a>
                 <form method="POST" action="{{ route('logout') }}">

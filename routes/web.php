@@ -102,13 +102,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/calendar/export/{jadwalKegiatan}', [CalendarController::class, 'exportTask'])->name('calendar.export-task');
     Route::post('/calendar/disconnect', [CalendarController::class, 'disconnect'])->name('calendar.disconnect');
 
-    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics', function () {
+        return redirect()->route('academic-tracker.index', ['tab' => 'analitik']);
+    })->name('analytics.index');
 
     Route::get('/akademik', [AcademicTrackerController::class, 'index'])->name('academic-tracker.index');
     Route::post('/akademik', [AcademicTrackerController::class, 'store'])->name('academic-tracker.store');
     Route::delete('/akademik/{courseGrade}', [AcademicTrackerController::class, 'destroy'])->name('academic-tracker.destroy');
 
-    Route::get('/integrations', [IntegrationsController::class, 'index'])->name('integrations.index');
+    Route::get('/integrations', function () {
+        return redirect()->route('profile.edit');
+    })->name('integrations.index');
     Route::get('/integrations/google/{service}', [IntegrationsController::class, 'connectGoogle'])->name('integrations.google.connect');
     Route::post('/integrations/google/disconnect', [IntegrationsController::class, 'disconnectGoogle'])->name('integrations.google.disconnect');
 

@@ -14,7 +14,7 @@ class IntegrationsPageTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route('integrations.index'))->assertOk();
+        $this->actingAs($user)->get(route('integrations.index'))->assertRedirect(route('profile.edit'));
     }
 
     public function test_unauthenticated_user_redirected_to_login(): void
