@@ -32,11 +32,6 @@
     setTheme(mode) {
         this.themeMode = mode;
     },
-    cycleTheme() {
-        const modes = ['light', 'dark', 'system'];
-        const next = modes[(modes.indexOf(this.themeMode) + 1) % modes.length];
-        this.setTheme(next);
-    },
     syncTheme(mode) {
         const token = document.querySelector('meta[name=\"csrf-token\"]');
         if (token) {
