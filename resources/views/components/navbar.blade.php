@@ -15,6 +15,7 @@
                 <a href="{{ route('college-schedule.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Jadkul</a>
                 <a href="{{ route('calendar.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Kalender</a>
                 <a href="{{ route('analytics.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Analitik</a>
+                <a href="{{ route('integrations.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Integrasi</a>
                 <div class="mx-1 h-5 w-px bg-slate-200"></div>
                 <a href="{{ route('settings.index') }}" class="rounded-2xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-700">Pengaturan</a>
                 <form method="POST" action="{{ route('logout') }}">
