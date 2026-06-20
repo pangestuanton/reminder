@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AcademicTrackerController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
@@ -101,6 +102,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/calendar/disconnect', [CalendarController::class, 'disconnect'])->name('calendar.disconnect');
 
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+
+    Route::get('/akademik', [AcademicTrackerController::class, 'index'])->name('academic-tracker.index');
+    Route::post('/akademik', [AcademicTrackerController::class, 'store'])->name('academic-tracker.store');
+    Route::delete('/akademik/{courseGrade}', [AcademicTrackerController::class, 'destroy'])->name('academic-tracker.destroy');
 
     Route::get('/integrations', [IntegrationsController::class, 'index'])->name('integrations.index');
     Route::get('/integrations/google/{service}', [IntegrationsController::class, 'connectGoogle'])->name('integrations.google.connect');

@@ -85,6 +85,11 @@ class User extends Authenticatable
         return $this->hasMany(NotificationLog::class);
     }
 
+    public function courseGrades(): HasMany
+    {
+        return $this->hasMany(CourseGrade::class);
+    }
+
     public function hasGoogleAccount(): bool
     {
         return $this->googleAccount !== null;
