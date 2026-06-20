@@ -24,28 +24,6 @@ class DashboardStatsService
 
     public function countdownText(?JadwalKegiatan $jadwalKegiatan): ?string
     {
-        if (! $jadwalKegiatan) {
-            return null;
-        }
-
-        if ($jadwalKegiatan->isOverdue()) {
-            return 'Tenggat sudah terlewat.';
-        }
-
-        $diffInMinutes = (int) round(now()->diffInMinutes($jadwalKegiatan->waktu_pelaksanaan, false));
-
-        if ($diffInMinutes < 60) {
-            return 'Dimulai dalam kurang dari 1 jam.';
-        }
-
-        $diffInHours = (int) round(now()->diffInHours($jadwalKegiatan->waktu_pelaksanaan, false));
-
-        if ($diffInHours < 24) {
-            return 'Tenggat dalam '.$diffInHours.' jam.';
-        }
-
-        $diffInDays = (int) round(now()->diffInDays($jadwalKegiatan->waktu_pelaksanaan, false));
-
-        return 'Tenggat dalam '.$diffInDays.' hari.';
+        return $jadwalKegiatan?->countdown_text;
     }
 }

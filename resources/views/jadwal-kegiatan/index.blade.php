@@ -90,16 +90,18 @@
                         </div>
                         <div>
                             <h2 class="text-lg font-semibold text-slate-900">{{ $jadwal->judul }}</h2>
-                            <p class="mt-1 text-sm text-slate-500">{{ $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') }}</p>
+                            <p class="mt-1 text-sm text-slate-500">{{ $jadwal->waktu_pelaksanaan ? $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') : 'Tanpa deadline' }}</p>
                             @if ($jadwal->course_name)
                                 <p class="mt-0.5 text-xs text-slate-400">{{ $jadwal->course_name }}</p>
                             @endif
                             @if ($jadwal->lokasi_atau_link)
                                 <p class="mt-1 text-sm text-slate-500">{{ $jadwal->lokasi_atau_link }}</p>
                             @endif
-                            <p class="mt-2 text-sm font-medium {{ $jadwal->isOverdue() ? 'text-red-600' : 'text-blue-600' }}">
-                                {{ app(\App\Services\DashboardStatsService::class)->countdownText($jadwal) }}
-                            </p>
+                            @if ($jadwal->countdown_text)
+                                <p class="mt-2 text-sm font-medium {{ $jadwal->isOverdue() ? 'text-red-600' : 'text-blue-600' }}">
+                                    {{ $jadwal->countdown_text }}
+                                </p>
+                            @endif
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-3 lg:justify-end">

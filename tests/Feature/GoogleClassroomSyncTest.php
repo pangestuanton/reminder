@@ -52,4 +52,27 @@ class GoogleClassroomSyncTest extends TestCase
             'source_id' => 'coursework-id-123',
         ]);
     }
+
+    public function test_tasks_without_due_date_can_be_saved_with_null_waktu_pelaksanaan(): void
+    {
+        $user = User::factory()->create();
+
+        $task = JadwalKegiatan::create([
+            'user_id' => $user->id,
+            'judul' => 'Tugas Tanpa Deadline',
+            'kategori' => 'tugas',
+            'waktu_pelaksanaan' => null,
+            'source' => 'classroom',
+            'source_id' => 'coursework-id-999',
+            'status' => 'pending',
+            'prioritas' => 'rendah',
+        ]);
+
+        $this->assertDatabaseHas('jadwal_kegiatans', [
+            'id' => $task->id,
+            'waktu_pelaksanaan' => null,
+        ]);
+
+        $this->assertNull($task->countdown_text);
+    }
 }

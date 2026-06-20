@@ -194,7 +194,7 @@ class GoogleClassroomService
     {
         $dueDateTime = $courseWork->due_date
             ? $courseWork->due_date->copy()->setTimeFromTimeString($courseWork->due_time_only ?? '23:59')
-            : now()->addDays(7);
+            : null;
 
         $kategori = match ($courseWork->work_type) {
             'QUIZ' => 'uts',
@@ -241,8 +241,11 @@ class GoogleClassroomService
         }
     }
 
-    protected function calculatePriority(Carbon $dueDateTime): string
+    protected function calculatePriority(?Carbon $dueDateTime): string
     {
+        if (! $dueDateTime) {
+            return 'rendah';
+        }
         $daysUntil = (int) now()->diffInDays($dueDateTime, false);
 
         if ($daysUntil < 0) {

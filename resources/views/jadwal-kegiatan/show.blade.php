@@ -39,7 +39,7 @@
             <dl class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div>
                     <dt class="text-sm font-medium text-slate-500">Deadline</dt>
-                    <dd class="mt-1 text-base text-slate-900">{{ $jadwalKegiatan->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') }}</dd>
+                    <dd class="mt-1 text-base text-slate-900">{{ $jadwalKegiatan->waktu_pelaksanaan ? $jadwalKegiatan->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') : 'Tanpa deadline' }}</dd>
                 </div>
                 @if ($jadwalKegiatan->course_name)
                     <div>
@@ -63,7 +63,7 @@
                 @endif
                 <div>
                     <dt class="text-sm font-medium text-slate-500">Countdown</dt>
-                    <dd class="mt-1 text-base font-medium {{ $jadwalKegiatan->isOverdue() ? 'text-red-600' : 'text-blue-600' }}">{{ app(\App\Services\DashboardStatsService::class)->countdownText($jadwalKegiatan) }}</dd>
+                    <dd class="mt-1 text-base font-medium {{ $jadwalKegiatan->isOverdue() ? 'text-red-600' : 'text-blue-600' }}">{{ $jadwalKegiatan->countdown_text ?: '-' }}</dd>
                 </div>
                 @if ($jadwalKegiatan->lokasi_atau_link && filter_var($jadwalKegiatan->lokasi_atau_link, FILTER_VALIDATE_URL))
                     <div>

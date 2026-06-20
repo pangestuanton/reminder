@@ -147,8 +147,10 @@
                             <p class="text-sm text-slate-500">Tugas Terdekat</p>
                             @if ($nearest)
                                 <h2 class="mt-2 text-xl font-semibold text-slate-900">{{ $nearest->judul }}</h2>
-                                <p class="mt-2 text-sm text-slate-600">{{ $nearest->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') }}</p>
-                                <p class="mt-3 text-sm font-medium text-blue-600">{{ $countdownText }}</p>
+                                <p class="mt-2 text-sm text-slate-600">{{ $nearest->waktu_pelaksanaan ? $nearest->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') : 'Tanpa deadline' }}</p>
+                                @if ($nearest->countdown_text)
+                                    <p class="mt-3 text-sm font-medium text-blue-600">{{ $nearest->countdown_text }}</p>
+                                @endif
                                 <div class="mt-4 flex flex-wrap gap-2">
                                     <x-badge>{{ ucfirst($nearest->kategori) }}</x-badge>
                                     <x-badge type="pending">Menunggu</x-badge>
@@ -191,7 +193,7 @@
                                             @endif
                                         </div>
                                         <h4 class="mt-3 font-semibold text-slate-900">{{ $jadwal->judul }}</h4>
-                                        <p class="mt-1 text-sm text-slate-500">{{ $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') }}</p>
+                                        <p class="mt-1 text-sm text-slate-500">{{ $jadwal->waktu_pelaksanaan ? $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') : 'Tanpa deadline' }}</p>
                                     </div>
                                     <a href="{{ route('jadwal-kegiatan.show', $jadwal) }}" class="text-sm font-semibold text-blue-600">Detail</a>
                                 </div>
@@ -217,8 +219,10 @@
                                             <x-badge>{{ ucfirst($jadwal->kategori) }}</x-badge>
                                         </div>
                                         <h4 class="mt-3 font-semibold text-slate-900">{{ $jadwal->judul }}</h4>
-                                        <p class="mt-1 text-sm text-slate-600">{{ $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') }}</p>
-                                        <p class="mt-2 text-sm font-medium text-yellow-700">{{ $countdownText }}</p>
+                                        <p class="mt-1 text-sm text-slate-600">{{ $jadwal->waktu_pelaksanaan ? $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') : 'Tanpa deadline' }}</p>
+                                        @if ($jadwal->countdown_text)
+                                            <p class="mt-2 text-sm font-medium text-yellow-700">{{ $jadwal->countdown_text }}</p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

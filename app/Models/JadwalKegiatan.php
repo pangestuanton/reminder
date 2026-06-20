@@ -131,12 +131,43 @@ class JadwalKegiatan extends Model
 
     public function isOverdue(): bool
     {
-        return $this->status === 'pending' && $this->waktu_pelaksanaan->isPast();
+        return $this->status === 'pending' && $this->waktu_pelaksanaan && $this->waktu_pelaksanaan->isPast();
     }
 
     public function daysUntilDue(): int
     {
+        if (! $this->waktu_pelaksanaan) {
+            return 999;
+        }
+
         return (int) now()->diffInDays($this->waktu_pelaksanaan, absolute: false);
+    }
+
+    public function getCountdownTextAttribute(): ?string
+    {
+        if ($this->isOverdue()) {
+            return 'Tenggat sudah terlewat.';
+        }
+
+        if (! $this->waktu_pelaksanaan) {
+            return null;
+        }
+
+        $diffInMinutes = (int) round(now()->diffInMinutes($this->waktu_pelaksanaan, false));
+
+        if ($diffInMinutes < 60) {
+            return 'Dimulai dalam kurang dari 1 jam.';
+        }
+
+        $diffInHours = (int) round(now()->diffInHours($this->waktu_pelaksanaan, false));
+
+        if ($diffInHours < 24) {
+            return 'Tenggat dalam '.$diffInHours.' jam.';
+        }
+
+        $diffInDays = (int) round(now()->diffInDays($this->waktu_pelaksanaan, false));
+
+        return 'Tenggat dalam '.$diffInDays.' hari.';
     }
 
     public function getEffectiveDeadline()
