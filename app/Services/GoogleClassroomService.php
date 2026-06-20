@@ -23,6 +23,16 @@ class GoogleClassroomService
         $this->httpClient = new Client(['verify' => false]);
     }
 
+    public function setHttpClient(Client $httpClient): void
+    {
+        $this->httpClient = $httpClient;
+    }
+
+    public function getHttpClient(): Client
+    {
+        return $this->httpClient;
+    }
+
     public function syncCourses(User $user): array
     {
         $account = $user->googleAccount;
@@ -118,14 +128,16 @@ class GoogleClassroomService
             // Process each work item independently so one failure doesn't skip the rest
             foreach ($works as $workData) {
                 try {
+                    $dueLocal = $this->parseDueDateTimeToLocal($workData['dueDate'] ?? null, $workData['dueTime'] ?? null);
+
                     $courseWork = GoogleClassroomCourseWork::updateOrCreate(
                         ['user_id' => $user->id, 'external_id' => $workData['id']],
                         [
                             'google_classroom_course_id' => $course->id,
                             'title' => $workData['title'] ?? '',
                             'description' => $workData['description'] ?? null,
-                            'due_date' => $this->parseDueDate($workData['dueDate'] ?? null),
-                            'due_time_only' => $this->parseDueTime($workData['dueTime'] ?? null),
+                            'due_date' => $dueLocal['due_date'],
+                            'due_time_only' => $dueLocal['due_time_only'],
                             'max_points' => $workData['maxPoints'] ?? null,
                             'work_type' => $workData['workType'] ?? 'ASSIGNMENT',
                             'status' => $workData['state'] ?? 'PUBLISHED',
@@ -297,26 +309,42 @@ class GoogleClassroomService
         return $result;
     }
 
-    protected function parseDueDate(?array $dueDate): ?Carbon
+    protected function parseDueDateTimeToLocal(?array $dueDate, ?array $dueTime): array
     {
         if (! $dueDate || ! isset($dueDate['year'])) {
-            return null;
+            return [
+                'due_date' => null,
+                'due_time_only' => null,
+            ];
         }
 
-        return Carbon::createFromDate(
+        if (! $dueTime || ! isset($dueTime['hours'])) {
+            return [
+                'due_date' => Carbon::createFromDate(
+                    $dueDate['year'],
+                    $dueDate['month'] ?? 1,
+                    $dueDate['day'] ?? 1
+                )->format('Y-m-d'),
+                'due_time_only' => null,
+            ];
+        }
+
+        $utc = Carbon::create(
             $dueDate['year'],
             $dueDate['month'] ?? 1,
-            $dueDate['day'] ?? 1
+            $dueDate['day'] ?? 1,
+            $dueTime['hours'],
+            $dueTime['minutes'] ?? 0,
+            0,
+            'UTC'
         );
-    }
 
-    protected function parseDueTime(?array $dueTime): ?string
-    {
-        if (! $dueTime || ! isset($dueTime['hours'])) {
-            return null;
-        }
+        $local = $utc->setTimezone(config('app.timezone', 'Asia/Jakarta'));
 
-        return sprintf('%02d:%02d', $dueTime['hours'], $dueTime['minutes'] ?? 0);
+        return [
+            'due_date' => $local->format('Y-m-d'),
+            'due_time_only' => $local->format('H:i'),
+        ];
     }
 
     protected function fetchCourses(string $token): array
