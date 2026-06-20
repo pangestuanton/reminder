@@ -1,10 +1,10 @@
 <x-layouts.app title="{{ $course->name }} - Aviona Sync">
     <div class="space-y-6">
         <div>
-            <a href="{{ route('classroom.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-700">&larr; Kembali</a>
-            <h1 class="mt-2 text-2xl md:text-3xl font-bold tracking-tight text-slate-900">{{ $course->name }}</h1>
+            <a href="{{ route('classroom.index') }}" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">&larr; Kembali</a>
+            <h1 class="mt-2 text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{{ $course->name }}</h1>
             @if ($course->section)
-                <p class="mt-1 text-sm text-slate-500">{{ $course->section }}</p>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $course->section }}</p>
             @endif
         </div>
 
@@ -24,17 +24,17 @@
                                         <x-badge type="pending">Menunggu</x-badge>
                                     @endif
                                 </div>
-                                <h3 class="mt-2 font-semibold text-slate-900">{{ $work->title }}</h3>
+                                <h3 class="mt-2 font-semibold text-slate-900 dark:text-white">{{ $work->title }}</h3>
                                 @if ($work->due_date)
-                                    <p class="mt-1 text-sm text-slate-500">Deadline: {{ $work->due_date->format('l, d F Y') }}{{ $work->due_time_only ? ' ' . $work->due_time_only : '' }}</p>
+                                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Deadline: {{ $work->due_date->format('l, d F Y') }}{{ $work->due_time_only ? ' ' . $work->due_time_only : '' }}</p>
                                 @endif
                                 @if ($work->description)
-                                    <p class="mt-2 text-sm text-slate-600 line-clamp-2">{{ $work->description }}</p>
+                                    <p class="mt-2 text-sm text-slate-600 dark:text-slate-300 line-clamp-2">{{ $work->description }}</p>
                                 @endif
                                 @if ($work->materials)
                                     <div class="mt-2 flex flex-wrap gap-1">
                                         @foreach ($work->materials as $material)
-                                            <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{{ $material['type'] }}: {{ $material['title'] ?? $material['id'] ?? 'file' }}</span>
+                                            <span class="rounded-full bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-xs text-slate-500 dark:text-slate-300">{{ $material['type'] }}: {{ $material['title'] ?? $material['id'] ?? 'file' }}</span>
                                         @endforeach
                                     </div>
                                 @endif

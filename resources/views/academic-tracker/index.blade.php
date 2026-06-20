@@ -5,17 +5,17 @@
     }" class="space-y-6">
         
         {{-- Header & Tab Section --}}
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-slate-200 pb-2">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
             <nav class="-mb-px flex gap-6">
                 <button @click="activeTab = 'nilai'; window.history.replaceState(null, null, '?tab=nilai')" 
-                    :class="activeTab === 'nilai' ? 'border-pink-500 text-pink-600 font-bold' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'"
+                    :class="activeTab === 'nilai' ? 'border-pink-500 text-pink-600 font-bold dark:text-pink-400' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'"
                     class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-semibold transition-all focus:outline-none">
-                    ✨ Nilai & IPK
+                    Nilai & IPK
                 </button>
                 <button @click="activeTab = 'analitik'; window.history.replaceState(null, null, '?tab=analitik')" 
-                    :class="activeTab === 'analitik' ? 'border-pink-500 text-pink-600 font-bold' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'"
+                    :class="activeTab === 'analitik' ? 'border-pink-500 text-pink-600 font-bold dark:text-pink-400' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'"
                     class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-semibold transition-all focus:outline-none">
-                    📈 Analitik Progres
+                    Analitik Progres
                 </button>
             </nav>
         </div>
@@ -25,27 +25,27 @@
             {{-- Title Section --}}
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Tracker Akademik</h1>
-                    <p class="mt-1 text-sm text-slate-500">Kelola nilai perkuliahan, hitung IPS & IPK secara otomatis dengan skala standar A=4.0 s/d E=0.0.</p>
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Tracker Akademik</h1>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Kelola nilai perkuliahan, hitung IPS & IPK secara otomatis dengan skala standar A=4.0 s/d E=0.0.</p>
                 </div>
-                <x-button @click="showAddModal = true" class="bg-pink-600 hover:bg-pink-700 focus:ring-pink-100">
-                    ✨ Tambah Nilai
+                <x-button @click="showAddModal = true" class="bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600 focus:ring-pink-100">
+                    Tambah Nilai
                 </x-button>
             </div>
 
             {{-- Statistics Overview --}}
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <x-card class="bg-gradient-to-br from-pink-500 to-rose-600 text-white border-0 shadow-lg">
+                <x-card class="bg-gradient-to-br from-pink-500 to-rose-600 text-white border-0 shadow-lg dark:from-pink-600 dark:to-rose-700">
                     <p class="text-sm font-medium text-pink-100">IPK Kumulatif</p>
-                    <p class="mt-2 text-4xl font-extrabold">{{ number_format($ipk, 2) }}</p>
+                    <p class="mt-2 text-4xl font-extrabold text-white">{{ number_format($ipk, 2) }}</p>
                     <p class="mt-2 text-xs text-pink-100/80">
                         Predikat: 
                         @if ($ipk >= 3.51)
-                            Pujian (Cum Laude) 👑
+                            Pujian (Cum Laude)
                         @elseif ($ipk >= 3.0)
-                            Sangat Memuaskan 🌟
+                            Sangat Memuaskan
                         @elseif ($ipk >= 2.0)
-                            Memuaskan 👍
+                            Memuaskan
                         @elseif ($ipk >= 1.0)
                             Cukup
                         @else
@@ -81,8 +81,8 @@
 
             {{-- Line Chart Card --}}
             <x-card>
-                <h3 class="text-lg font-semibold text-slate-900">Perkembangan IP Semester (IPS)</h3>
-                <p class="text-sm text-slate-500">Grafik tren nilai indeks prestasi dari semester ke semester.</p>
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Perkembangan IP Semester (IPS)</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Grafik tren nilai indeks prestasi dari semester ke semester.</p>
 
                 <div class="mt-6">
                     @if (count($chartPoints) > 0)
@@ -100,8 +100,8 @@
                                     @php
                                         $guideY = ($chartHeight - $chartPadding) - ($g * (($chartHeight - 2 * $chartPadding) / 4));
                                     @endphp
-                                    <line x1="{{ $chartPadding }}" y1="{{ $guideY }}" x2="{{ $chartWidth - $chartPadding }}" y2="{{ $guideY }}" class="stroke-slate-100" stroke-width="1" stroke-dasharray="4" />
-                                    <text x="{{ $chartPadding - 8 }}" y="{{ $guideY + 4 }}" text-anchor="end" class="text-[10px] font-medium fill-slate-400 font-sans">{{ number_format($g, 1) }}</text>
+                                    <line x1="{{ $chartPadding }}" y1="{{ $guideY }}" x2="{{ $chartWidth - $chartPadding }}" y2="{{ $guideY }}" class="stroke-slate-100 dark:stroke-slate-800" stroke-width="1" stroke-dasharray="4" />
+                                    <text x="{{ $chartPadding - 8 }}" y="{{ $guideY + 4 }}" text-anchor="end" class="text-[10px] font-medium fill-slate-400 dark:fill-slate-500 font-sans">{{ number_format($g, 1) }}</text>
                                 @endfor
 
                                 {{-- Area under the line --}}
@@ -119,18 +119,20 @@
                                     <circle cx="{{ $point['x'] }}" cy="{{ $point['y'] }}" r="5" fill="#ffffff" stroke="#db2777" stroke-width="2.5" class="transition hover:r-6 cursor-pointer" />
                                     
                                     {{-- IPS Value Tag --}}
-                                    <text x="{{ $point['x'] }}" y="{{ $point['y'] - 10 }}" text-anchor="middle" class="text-[11px] font-bold fill-pink-700 font-sans bg-white">{{ number_format($point['ips'], 2) }}</text>
+                                    <text x="{{ $point['x'] }}" y="{{ $point['y'] - 10 }}" text-anchor="middle" class="text-[11px] font-bold fill-pink-700 dark:fill-pink-400 font-sans">{{ number_format($point['ips'], 2) }}</text>
                                     
                                     {{-- Semester Label on X axis --}}
-                                    <text x="{{ $point['x'] }}" y="{{ $chartHeight - $chartPadding + 18 }}" text-anchor="middle" class="text-[10px] font-semibold fill-slate-500 font-sans">Sem {{ $point['semester'] }}</text>
+                                    <text x="{{ $point['x'] }}" y="{{ $chartHeight - $chartPadding + 18 }}" text-anchor="middle" class="text-[10px] font-semibold fill-slate-500 dark:fill-slate-400 font-sans">Sem {{ $point['semester'] }}</text>
                                 @endforeach
                             </svg>
                         </div>
                     @else
                         <div class="flex flex-col items-center justify-center py-12 text-center">
-                            <span class="text-4xl">📈</span>
-                            <h4 class="mt-4 font-semibold text-slate-700">Grafik belum tersedia</h4>
-                            <p class="mt-1 text-sm text-slate-400 max-w-sm">Masukkan nilai mata kuliah terlebih dahulu untuk melihat perkembangan IP semester Anda.</p>
+                            <svg class="mx-auto h-12 w-12 text-slate-400 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            <h4 class="mt-4 font-semibold text-slate-700 dark:text-slate-300">Grafik belum tersedia</h4>
+                            <p class="mt-1 text-sm text-slate-400 dark:text-slate-500 max-w-sm">Masukkan nilai mata kuliah terlebih dahulu untuk melihat perkembangan IP semester Anda.</p>
                         </div>
                     @endif
                 </div>
@@ -139,18 +141,18 @@
             {{-- Semester Details --}}
             <div class="space-y-6">
                 @forelse ($semesterStats as $semNum => $sem)
-                    <x-card class="overflow-hidden p-0 border-slate-100">
+                    <x-card class="overflow-hidden p-0 border-slate-100 dark:border-slate-700">
                         {{-- Semester Summary Header --}}
-                        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50/75 px-5 py-4 border-b border-slate-100">
+                        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50/75 dark:bg-slate-800/50 px-5 py-4 border-b border-slate-100 dark:border-slate-700/60">
                             <div class="flex items-center gap-3">
-                                <h3 class="text-lg font-bold text-slate-800">Semester {{ $semNum }}</h3>
-                                <span class="rounded-full bg-slate-200/60 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Semester {{ $semNum }}</h3>
+                                <span class="rounded-full bg-slate-200/60 dark:bg-slate-700/60 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
                                     {{ $sem['total_sks'] }} SKS
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-slate-500">IP Semester:</span>
-                                <span class="rounded-xl bg-pink-50 px-3 py-1 text-base font-extrabold text-pink-700">
+                                <span class="text-sm font-medium text-slate-500 dark:text-slate-400">IP Semester:</span>
+                                <span class="rounded-xl bg-pink-50 dark:bg-pink-900/30 px-3 py-1 text-base font-extrabold text-pink-700 dark:text-pink-400">
                                     {{ number_format($sem['ips'], 2) }}
                                 </span>
                             </div>
@@ -160,7 +162,7 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr class="border-b border-slate-100 bg-white text-xs font-bold uppercase tracking-wider text-slate-400">
+                                    <tr class="border-b border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                                         <th class="px-6 py-3 font-semibold">Mata Kuliah</th>
                                         <th class="px-6 py-3 font-semibold text-center w-24">SKS</th>
                                         <th class="px-6 py-3 font-semibold text-center w-24">Nilai</th>
@@ -168,21 +170,21 @@
                                         <th class="px-6 py-3 text-right w-24">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-50 bg-white">
+                                <tbody class="divide-y divide-slate-50 dark:divide-slate-700/50 bg-white dark:bg-slate-800">
                                     @foreach ($sem['grades'] as $grade)
-                                        <tr class="hover:bg-slate-50/50 transition">
-                                            <td class="px-6 py-4 text-sm font-medium text-slate-900 break-words">{{ $grade->mata_kuliah }}</td>
-                                            <td class="px-6 py-4 text-sm text-slate-600 text-center font-medium">{{ $grade->sks }}</td>
+                                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/50 transition">
+                                            <td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white break-words">{{ $grade->mata_kuliah }}</td>
+                                            <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300 text-center font-medium">{{ $grade->sks }}</td>
                                             <td class="px-6 py-4 text-sm text-center">
-                                                <span class="rounded-full px-2.5 py-0.5 text-xs font-bold bg-pink-50 text-pink-700">
+                                                <span class="rounded-full px-2.5 py-0.5 text-xs font-bold bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400">
                                                     {{ $grade->nilai }}
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-slate-600 text-center font-medium">{{ number_format($grade->grade_point, 1) }}</td>
+                                            <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300 text-center font-medium">{{ number_format($grade->grade_point, 1) }}</td>
                                             <td class="px-6 py-4 text-right">
                                                 <x-modal message="Apakah Anda yakin ingin menghapus nilai mata kuliah ini?">
                                                     <x-slot:trigger>
-                                                        <button type="button" class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-700 transition">Hapus</button>
+                                                        <button type="button" class="inline-flex items-center text-xs font-semibold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition">Hapus</button>
                                                     </x-slot:trigger>
                                                     <form method="POST" action="{{ route('academic-tracker.destroy', $grade) }}">
                                                         @csrf
@@ -199,7 +201,7 @@
                     </x-card>
                 @empty
                     <x-empty-state title="Belum ada data akademik" description="Mulailah dengan menambahkan mata kuliah dan nilaimu per semester.">
-                        <x-button @click="showAddModal = true" class="bg-pink-600 hover:bg-pink-700">✨ Tambah Nilai</x-button>
+                        <x-button @click="showAddModal = true" class="bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600">Tambah Nilai</x-button>
                     </x-empty-state>
                 @endforelse
             </div>
@@ -209,23 +211,23 @@
         <div x-show="activeTab === 'analitik'" x-transition class="space-y-6" style="display: none;">
             {{-- Title Section --}}
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Analitik Progres</h1>
-                <p class="mt-1 text-sm text-slate-500">Pantau progres penyelesaian tugas dan statistik aktivitas belajarmu.</p>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Analitik Progres</h1>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Pantau progres penyelesaian tugas dan statistik aktivitas belajarmu.</p>
             </div>
 
             {{-- Filters Form --}}
-            <form method="GET" action="{{ route('academic-tracker.index') }}" class="flex flex-wrap items-end gap-3 rounded-3xl border border-slate-100 bg-white p-4">
+            <form method="GET" action="{{ route('academic-tracker.index') }}" class="flex flex-wrap items-end gap-3 rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
                 <input type="hidden" name="tab" value="analitik">
                 <div>
-                    <label class="mb-1 block text-xs font-medium text-slate-500">Dari Tanggal</label>
+                    <label class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Dari Tanggal</label>
                     <x-input name="date_from" type="date" value="{{ $filters['date_from'] ?? '' }}" />
                 </div>
                 <div>
-                    <label class="mb-1 block text-xs font-medium text-slate-500">Sampai Tanggal</label>
+                    <label class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Sampai Tanggal</label>
                     <x-input name="date_to" type="date" value="{{ $filters['date_to'] ?? '' }}" />
                 </div>
                 <div>
-                    <label class="mb-1 block text-xs font-medium text-slate-500">Mata Kuliah</label>
+                    <label class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Mata Kuliah</label>
                     <x-select name="course">
                         <option value="">Semua</option>
                         @foreach ($courses as $course)
@@ -234,7 +236,7 @@
                     </x-select>
                 </div>
                 <div>
-                    <label class="mb-1 block text-xs font-medium text-slate-500">Kategori</label>
+                    <label class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Kategori</label>
                     <x-select name="category">
                         <option value="">Semua</option>
                         @foreach (['tugas','kuliah','uts','uas','organisasi'] as $cat)
@@ -243,7 +245,7 @@
                     </x-select>
                 </div>
                 <div>
-                    <label class="mb-1 block text-xs font-medium text-slate-500">Sumber</label>
+                    <label class="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Sumber</label>
                     <x-select name="source">
                         <option value="">Semua</option>
                         @foreach (['local','classroom','calendar'] as $src)
@@ -259,25 +261,25 @@
             {{-- Analytics Stats Overview Grid --}}
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
                 <x-card>
-                    <p class="text-sm font-medium text-slate-500">Total Tugas</p>
-                    <p class="mt-2 text-3xl font-extrabold text-slate-900">{{ $total }}</p>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Tugas</p>
+                    <p class="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">{{ $total }}</p>
                 </x-card>
                 <x-card>
-                    <p class="text-sm font-medium text-slate-500">Selesai</p>
-                    <p class="mt-2 text-3xl font-extrabold text-emerald-600">{{ $completed }}</p>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Selesai</p>
+                    <p class="mt-2 text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">{{ $completed }}</p>
                 </x-card>
                 <x-card>
-                    <p class="text-sm font-medium text-slate-500">Dikerjakan</p>
-                    <p class="mt-2 text-3xl font-extrabold text-blue-600">{{ $in_progress }}</p>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Dikerjakan</p>
+                    <p class="mt-2 text-3xl font-extrabold text-blue-600 dark:text-blue-400">{{ $in_progress }}</p>
                 </x-card>
                 <x-card>
-                    <p class="text-sm font-medium text-slate-500">Terlambat</p>
-                    <p class="mt-2 text-3xl font-extrabold text-red-600">{{ $overdue }}</p>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Terlambat</p>
+                    <p class="mt-2 text-3xl font-extrabold text-red-600 dark:text-red-400">{{ $overdue }}</p>
                 </x-card>
                 <x-card>
-                    <p class="text-sm font-medium text-slate-500">Progres</p>
-                    <p class="mt-2 text-3xl font-extrabold text-pink-600">{{ $percentage }}%</p>
-                    <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Progres</p>
+                    <p class="mt-2 text-3xl font-extrabold text-pink-600 dark:text-pink-400">{{ $percentage }}%</p>
+                    <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
                         <div class="h-full rounded-full bg-pink-500" style="width: {{ $percentage }}%"></div>
                     </div>
                 </x-card>
@@ -287,16 +289,16 @@
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <div class="lg:col-span-2">
                     <x-card>
-                        <h3 class="text-lg font-semibold text-slate-900">Tren Mingguan</h3>
-                        <p class="text-sm text-slate-500">Jumlah tugas yang diselesaikan 7 hari terakhir.</p>
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Tren Mingguan</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Jumlah tugas yang diselesaikan 7 hari terakhir.</p>
                         <div class="mt-6 grid grid-cols-7 gap-2">
                             @foreach ($weekly_trend as $day)
                                 <div class="text-center">
                                     <div class="mx-auto mb-2 flex h-24 items-end justify-center">
-                                        <div class="w-8 rounded-t-lg bg-pink-500 transition-all" style="height: {{ min(($day['completed'] * 20) + 4, 96) }}px"></div>
+                                        <div class="w-8 rounded-t-lg bg-pink-500 dark:bg-pink-600 transition-all" style="height: {{ min(($day['completed'] * 20) + 4, 96) }}px"></div>
                                     </div>
-                                    <p class="text-xs font-medium text-slate-700">{{ $day['day'] }}</p>
-                                    <p class="text-xs font-bold text-slate-500 mt-1">{{ $day['completed'] }}</p>
+                                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300">{{ $day['day'] }}</p>
+                                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1">{{ $day['completed'] }}</p>
                                 </div>
                             @endforeach
                         </div>
@@ -306,14 +308,14 @@
                 <div>
                     @if ($upcoming->isNotEmpty())
                         <x-card class="h-full">
-                            <h3 class="text-lg font-semibold text-slate-900">Tugas Mendatang</h3>
-                            <p class="text-sm text-slate-500 mb-4">Agenda akademik berikutnya.</p>
+                            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Tugas Mendatang</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Agenda akademik berikutnya.</p>
                             <div class="space-y-3">
                                 @foreach ($upcoming as $task)
-                                    <div class="flex items-center gap-3 rounded-2xl bg-pink-50/20 p-3 border border-pink-100/30">
+                                    <div class="flex items-center gap-3 rounded-2xl bg-pink-50/20 dark:bg-pink-950/10 p-3 border border-pink-100/30 dark:border-pink-900/20">
                                         <span class="h-2.5 w-2.5 rounded-full bg-pink-500"></span>
-                                        <span class="text-sm font-semibold text-slate-700 truncate max-w-[120px]">{{ $task->judul }}</span>
-                                        <span class="ml-auto text-xs font-medium text-slate-400">{{ $task->waktu_pelaksanaan->format('d/m/Y') }}</span>
+                                        <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[120px]">{{ $task->judul }}</span>
+                                        <span class="ml-auto text-xs font-medium text-slate-400 dark:text-slate-500">{{ $task->waktu_pelaksanaan->format('d/m/Y') }}</span>
                                     </div>
                                 @endforeach
                             </div>
@@ -325,9 +327,9 @@
 
         {{-- Add Modal for Academic Grade --}}
         <div x-show="showAddModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4" style="display:none;">
-            <div @click.away="showAddModal = false" class="w-full max-w-md rounded-3xl bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="text-lg font-bold text-slate-900">✨ Tambah Nilai Mata Kuliah</h3>
+            <div @click.away="showAddModal = false" class="w-full max-w-md rounded-3xl bg-white dark:bg-slate-800 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-transparent dark:border-slate-700">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Tambah Nilai Mata Kuliah</h3>
                     <button @click="showAddModal = false" class="text-slate-400 hover:text-slate-600 text-2xl font-semibold leading-none">&times;</button>
                 </div>
 
@@ -335,7 +337,7 @@
                     @csrf
                     
                     <div>
-                        <label class="mb-2 block text-sm font-semibold text-slate-700">Semester</label>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Semester</label>
                         <x-select name="semester" required>
                             @for ($s = 1; $s <= 10; $s++)
                                 <option value="{{ $s }}">Semester {{ $s }}</option>
@@ -344,13 +346,13 @@
                     </div>
 
                     <div>
-                        <label class="mb-2 block text-sm font-semibold text-slate-700">Nama Mata Kuliah</label>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Nama Mata Kuliah</label>
                         <x-input name="mata_kuliah" placeholder="Contoh: Algoritma & Struktur Data" required />
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="mb-2 block text-sm font-semibold text-slate-700">Jumlah SKS</label>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Jumlah SKS</label>
                             <x-select name="sks" required>
                                 @for ($k = 1; $k <= 6; $k++)
                                     <option value="{{ $k }}" @selected($k === 3)>{{ $k }} SKS</option>
@@ -359,7 +361,7 @@
                         </div>
 
                         <div>
-                            <label class="mb-2 block text-sm font-semibold text-slate-700">Nilai Huruf</label>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Nilai Huruf</label>
                             <x-select name="nilai" required>
                                 <option value="A">A (4.0)</option>
                                 <option value="AB">AB (3.5)</option>
@@ -372,9 +374,9 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 flex justify-end gap-3 pt-3 border-t border-slate-100">
-                        <button type="button" @click="showAddModal = false" class="inline-flex items-center justify-center rounded-2xl border border-slate-100 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Batal</button>
-                        <x-button type="submit" class="bg-pink-600 hover:bg-pink-700 focus:ring-pink-100">Simpan Nilai</x-button>
+                    <div class="mt-6 flex justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-700">
+                        <button type="button" @click="showAddModal = false" class="inline-flex items-center justify-center rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700">Batal</button>
+                        <x-button type="submit" class="bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600 focus:ring-pink-100">Simpan Nilai</x-button>
                     </div>
                 </form>
             </div>

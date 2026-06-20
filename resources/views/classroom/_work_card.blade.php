@@ -13,7 +13,7 @@
                 </span>
 
                 @if ($work->isSubmitted())
-                    <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">✓ Selesai</span>
+                    <span class="rounded-full bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">Selesai</span>
                 @elseif ($daysLeft !== null)
                     @if ($daysLeft < 0)
                         <span class="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600">Terlambat {{ abs($daysLeft) }} hari</span>
@@ -32,23 +32,23 @@
             </div>
 
             {{-- Title --}}
-            <h3 class="font-semibold text-slate-900 leading-tight">{{ Str::limit($work->title, 80) }}</h3>
+            <h3 class="font-semibold text-slate-900 dark:text-white leading-tight">{{ Str::limit($work->title, 80) }}</h3>
 
             {{-- Course name --}}
             @if ($work->course)
-                <p class="mt-0.5 text-xs text-slate-400">📚 {{ $work->course->name }}</p>
+                <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{{ $work->course->name }}</p>
             @endif
 
             {{-- Due date --}}
             @if ($work->due_date)
-                <p class="mt-1 text-sm text-slate-500">
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
                     Deadline: {{ $work->due_date->translatedFormat('l, d F Y') }}{{ $work->due_time_only ? ' pukul ' . $work->due_time_only : '' }}
                 </p>
             @endif
 
             {{-- Description snippet --}}
             @if ($work->description)
-                <p class="mt-1 text-xs text-slate-400 line-clamp-2">{{ $work->description }}</p>
+                <p class="mt-1 text-xs text-slate-400 dark:text-slate-500 line-clamp-2">{{ $work->description }}</p>
             @endif
 
         </div>

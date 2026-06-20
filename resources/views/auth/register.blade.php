@@ -1,16 +1,16 @@
 <x-layouts.guest title="Daftar - Aviona Sync">
-    <div class="w-full rounded-[2rem] bg-white p-6 shadow-card sm:p-8">
+    <div class="w-full rounded-[2rem] bg-white dark:bg-slate-900 p-6 shadow-card border border-slate-100 dark:border-slate-800/80 sm:p-8">
         <div class="mb-8 text-center">
-            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-white p-1.5 shadow-[0_8px_30px_rgb(236,72,153,0.15)]">
+            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-white dark:bg-slate-800 p-1.5 shadow-[0_8px_30px_rgb(236,72,153,0.15)]">
                 <img src="{{ asset('images/logo.png') }}" alt="Aviona Sync Logo" class="h-full w-full object-contain rounded-2xl">
             </div>
-            <h1 class="mt-5 text-3xl font-bold tracking-tight text-slate-900">Aviona Sync</h1>
-            <h2 class="mt-2 text-lg font-semibold text-slate-800">Buat akun baru</h2>
-            <p class="mt-2 text-sm leading-relaxed text-slate-500">Mulai atur jadwal akademikmu dengan tampilan yang nyaman dan pengingat yang konsisten.</p>
+            <h1 class="mt-5 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Aviona Sync</h1>
+            <h2 class="mt-2 text-lg font-semibold text-slate-800 dark:text-slate-200">Buat akun baru</h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">Mulai atur jadwal akademikmu dengan tampilan yang nyaman dan pengingat yang konsisten.</p>
         </div>
 
         <div class="space-y-4">
-            <a href="{{ route('google.redirect') }}" class="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-100">
+            <a href="{{ route('google.redirect') }}" class="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm transition hover:bg-slate-50 dark:hover:bg-slate-800/60 focus:outline-none focus:ring-4 focus:ring-slate-100 dark:focus:ring-offset-slate-950">
                 <svg class="h-5 w-5" width="20" height="20" viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0;">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -22,10 +22,10 @@
 
             <div class="relative">
                 <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-slate-200"></div>
+                    <div class="w-full border-t border-slate-200 dark:border-slate-800"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="bg-white px-3 text-slate-400">atau daftar dengan email</span>
+                    <span class="bg-white dark:bg-slate-900 px-3 text-slate-400 dark:text-slate-500">atau daftar dengan email</span>
                 </div>
             </div>
         </div>
@@ -34,34 +34,35 @@
             @csrf
 
             <div>
-                <label for="name" class="mb-2 block text-sm font-medium text-slate-700">Nama Lengkap</label>
+                <label for="name" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Nama Lengkap</label>
                 <x-input id="name" name="name" value="{{ old('name') }}" required autofocus placeholder="Masukkan nama lengkap" />
                 <x-validation-error name="name" />
             </div>
 
             <div>
-                <label for="email" class="mb-2 block text-sm font-medium text-slate-700">Alamat Email</label>
+                <label for="email" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Alamat Email</label>
                 <x-input id="email" name="email" type="email" value="{{ old('email') }}" required placeholder="nama@kampus.ac.id" />
                 <x-validation-error name="email" />
             </div>
 
             <div>
-                <label for="password" class="mb-2 block text-sm font-medium text-slate-700">Kata Sandi</label>
+                <label for="password" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Kata Sandi</label>
                 <x-input id="password" name="password" type="password" required placeholder="Minimal 8 karakter" />
                 <x-validation-error name="password" />
             </div>
 
             <div>
-                <label for="password_confirmation" class="mb-2 block text-sm font-medium text-slate-700">Konfirmasi Kata Sandi</label>
+                <label for="password_confirmation" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Konfirmasi Kata Sandi</label>
                 <x-input id="password_confirmation" name="password_confirmation" type="password" required placeholder="Ulangi kata sandi" />
             </div>
 
             <x-button type="submit" class="w-full">Daftar</x-button>
         </form>
 
-        <div class="mt-6 rounded-2xl bg-pink-50/50 px-4 py-3 text-center text-sm text-slate-500">
+        <div class="mt-6 rounded-2xl bg-pink-50/30 dark:bg-pink-950/10 px-4 py-3 text-center text-sm text-slate-500 dark:text-slate-400">
             Sudah punya akun?
-            <a href="{{ route('login') }}" class="font-semibold text-pink-600 transition hover:text-pink-700">Masuk di sini</a>
+            <a href="{{ route('login') }}" class="font-semibold text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300 transition">Masuk di sini</a>
         </div>
     </div>
 </x-layouts.guest>
+
