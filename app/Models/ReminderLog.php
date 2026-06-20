@@ -15,11 +15,14 @@ class ReminderLog extends Model
         'jadwal_kegiatan_id',
         'reminder_type',
         'channel',
+        'status',
         'sent_at',
+        'failed_at',
     ];
 
     protected $casts = [
         'sent_at' => 'datetime',
+        'failed_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

@@ -169,8 +169,7 @@ Recommended implementation:
 - Artisan command: `php artisan aviona:send-schedule-reminders`
 - Service: `ReminderService`
 - Notifications:
-  - `ScheduleH3Reminder`
-  - `ScheduleH1Reminder`
+  - `ScheduleTelegramReminder`
 - Tracking table: `reminder_logs`
 
 Acceptance criteria:
@@ -339,8 +338,7 @@ aviona-sync/
 │   ├── Http/Requests/UpdateJadwalKegiatanRequest.php
 │   ├── Models/JadwalKegiatan.php
 │   ├── Models/ReminderLog.php
-│   ├── Notifications/ScheduleH1Reminder.php
-│   ├── Notifications/ScheduleH3Reminder.php
+│   ├── Notifications/ScheduleTelegramReminder.php
 │   ├── Policies/JadwalKegiatanPolicy.php
 │   └── Services/
 ├── database/
@@ -391,7 +389,7 @@ MVP must include:
 
 1. Calendar view.
 2. Export to Google Calendar.
-3. WhatsApp or Telegram reminders.
+3. Telegram reminders.
 4. AI schedule extraction from screenshots or chat messages.
 5. Multi-class shared schedule boards.
 6. Role-based admin panel.

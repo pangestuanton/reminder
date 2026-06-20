@@ -7,8 +7,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JadwalKegiatanController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TelegramLinkController;
 use App\Models\JadwalKegiatan;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/telegram', [TelegramLinkController::class, 'store'])->name('profile.telegram.store');
+    Route::delete('/profile/telegram', [TelegramLinkController::class, 'destroy'])->name('profile.telegram.destroy');
 
     Route::get('/jadwal-kegiatan', [JadwalKegiatanController::class, 'index'])->name('jadwal-kegiatan.index');
 
@@ -66,9 +68,4 @@ Route::middleware('auth')->group(function () {
         ->can('complete', 'jadwalKegiatan')
         ->name('jadwal-kegiatan.complete');
 
-    Route::get('/api/trigger-reminders', function () {
-        Artisan::call('aviona:send-schedule-reminders');
-
-        return response()->json(['message' => 'Reminders processed']);
-    });
 });

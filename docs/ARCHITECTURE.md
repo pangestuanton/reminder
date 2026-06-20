@@ -110,8 +110,7 @@ Notifications send reminder content.
 
 Required notifications:
 
-- `ScheduleH3Reminder`
-- `ScheduleH1Reminder`
+- `ScheduleTelegramReminder`
 
 Every notification message must be Indonesian.
 

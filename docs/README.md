@@ -70,8 +70,7 @@ aviona-sync/
 │   │   ├── JadwalKegiatan.php
 │   │   └── ReminderLog.php
 │   ├── Notifications/
-│   │   ├── ScheduleH1Reminder.php
-│   │   └── ScheduleH3Reminder.php
+│   │   └── ScheduleTelegramReminder.php
 │   ├── Policies/
 │   │   └── JadwalKegiatanPolicy.php
 │   └── Services/

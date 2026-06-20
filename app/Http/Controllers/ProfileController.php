@@ -23,13 +23,11 @@ class ProfileController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'whatsapp_number' => ['nullable', 'string', 'max:20'],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Alamat email wajib diisi.',
             'email.email' => 'Alamat email harus valid.',
             'email.unique' => 'Alamat email sudah digunakan.',
-            'whatsapp_number.max' => 'Nomor WhatsApp tidak boleh lebih dari 20 karakter.',
         ]);
 
         $user->update($data);

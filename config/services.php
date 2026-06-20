@@ -37,11 +37,13 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL').'/auth/google/callback'),
     ],
 
-    'fonnte' => [
-        'token' => env('FONNTE_TOKEN'),
-        'base_url' => env('FONNTE_BASE_URL', 'https://api.fonnte.com/send'),
-        'enabled' => env('FONNTE_ENABLED', false),
-        'test_target' => env('FONNTE_TEST_TARGET'),
+    'telegram-bot-api' => [
+        'token' => env('TELEGRAM_BOT_TOKEN'),
+    ],
+
+    'telegram' => [
+        'bot_username' => env('TELEGRAM_BOT_USERNAME'),
+        'webhook_secret' => env('TELEGRAM_WEBHOOK_SECRET'),
     ],
 
 ];

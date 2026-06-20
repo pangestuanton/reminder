@@ -36,14 +36,9 @@ SESSION_DRIVER=database
 CACHE_STORE=database
 QUEUE_CONNECTION=database
 
-MAIL_MAILER=smtp
-MAIL_HOST=your-mail-host
-MAIL_PORT=587
-MAIL_USERNAME=your-mail-username
-MAIL_PASSWORD=your-mail-password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=no-reply@aviona-sync.app
-MAIL_FROM_NAME="Aviona Sync"
+TELEGRAM_BOT_TOKEN=your-botfather-token
+TELEGRAM_BOT_USERNAME=your_bot_username
+TELEGRAM_WEBHOOK_SECRET=your-random-webhook-secret
 ```
 
 Do not commit real values.

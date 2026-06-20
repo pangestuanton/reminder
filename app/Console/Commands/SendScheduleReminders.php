@@ -9,17 +9,16 @@ class SendScheduleReminders extends Command
 {
     protected $signature = 'aviona:send-schedule-reminders';
 
-    protected $description = 'Mengirim pengingat jadwal H-3 dan H-1';
+    protected $description = 'Mengantrekan pengingat jadwal melalui Telegram';
 
     public function handle(ReminderService $reminderService): int
     {
         $result = $reminderService->sendDueReminders();
 
-        $this->info('Pengingat terkirim: '.$result['total']);
-        $this->line('H-3 Email: '.$result['h3_mail']);
-        $this->line('H-1 Email: '.$result['h1_mail']);
-        $this->line('H-3 WhatsApp: '.$result['h3_whatsapp']);
-        $this->line('H-1 WhatsApp: '.$result['h1_whatsapp']);
+        $this->info('Pengingat Telegram diantrekan: '.$result['total']);
+        $this->line('H-3: '.$result['h3_telegram']);
+        $this->line('H-1: '.$result['h1_telegram']);
+        $this->line('Hitung mundur 3 jam: '.$result['countdown_telegram']);
 
         return self::SUCCESS;
     }

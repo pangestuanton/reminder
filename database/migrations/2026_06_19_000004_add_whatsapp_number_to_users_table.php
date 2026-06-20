@@ -1,22 +1,15 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
-    {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('whatsapp_number')->nullable()->after('avatar');
-        });
-    }
+    /**
+     * This no-op migration is retained because deployed databases may already
+     * contain its name in the migration history. The legacy field is removed
+     * by the Telegram migration that follows it.
+     */
+    public function up(): void {}
 
-    public function down(): void
-    {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('whatsapp_number');
-        });
-    }
+    public function down(): void {}
 };

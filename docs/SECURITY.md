@@ -151,7 +151,7 @@ Before production deployment:
 - Strong `APP_KEY`
 - HTTPS URL configured
 - Database credentials in Railway variables
-- Mail credentials in Railway variables
+- Telegram bot token and webhook secret in Railway variables
 - No test credentials in repository
 - No stack traces exposed to users
 

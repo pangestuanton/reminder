@@ -9,7 +9,7 @@
 
 ## About Aviona Sync
 
-Aviona Sync adalah aplikasi manajemen jadwal kegiatan dengan integrasi Google Login, pengingat via email dan WhatsApp (Fonnte).
+Aviona Sync adalah aplikasi manajemen jadwal kegiatan dengan integrasi Google Login dan pengingat otomatis melalui Telegram Bot.
 
 ## Deployment ke Railway
 
@@ -43,23 +43,13 @@ SESSION_DRIVER=database
 CACHE_STORE=database
 QUEUE_CONNECTION=database
 
-MAIL_MAILER=log
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="your-email@gmail.com"
-MAIL_FROM_NAME="${APP_NAME}"
-
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 GOOGLE_REDIRECT_URI=https://your-app-name.up.railway.app/auth/google/callback
 
-FONNTE_ENABLED=true
-FONNTE_TOKEN=your-fonnte-token
-FONNTE_BASE_URL=https://api.fonnte.com
-FONNTE_TEST_TARGET=your-whatsapp-number
+TELEGRAM_BOT_TOKEN=your-botfather-token
+TELEGRAM_BOT_USERNAME=your_bot_username
+TELEGRAM_WEBHOOK_SECRET=your-random-webhook-secret
 ```
 
 > **Tip:** Di Railway, variabel `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` otomatis tersedia jika kamu pakai PostgreSQL plugin Railway. Gunakan `${{PostgreSQL.DATABASE_URL}}` atau set manual.
@@ -80,7 +70,19 @@ Tambahkan service kedua di Railway dengan command:
 php artisan schedule:work
 ```
 
-Ini menjalankan scheduler untuk mengirim pengingat H-3 dan H-1 via email + WhatsApp.
+Tambahkan service ketiga untuk queue worker:
+
+```
+php artisan queue:work --queue=telegram --tries=3 --timeout=30
+```
+
+Scheduler mengantrekan pengingat H-3, H-1, dan hitung mundur tiga jam. Queue worker mengirim semuanya melalui Telegram.
+
+Setelah deployment pertama, daftarkan webhook Telegram:
+
+```
+php artisan telegram:set-webhook
+```
 
 ### Setup Lokal
 

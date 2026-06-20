@@ -2,102 +2,51 @@
 
 namespace App\Services;
 
+use App\Jobs\SendTelegramReminder;
 use App\Models\JadwalKegiatan;
-use App\Models\ReminderLog;
-use App\Notifications\ScheduleH1Reminder;
-use App\Notifications\ScheduleH3Reminder;
 use Illuminate\Support\Collection;
 
 class ReminderService
 {
-    public function __construct(private readonly WhatsappReminderService $whatsappReminderService) {}
-
     public function sendDueReminders(): array
     {
-        $h3Mail = $this->sendMailForType(3, 'h3');
-        $h1Mail = $this->sendMailForType(1, 'h1');
-        $h3Whatsapp = $this->sendWhatsappForType(3, 'h3');
-        $h1Whatsapp = $this->sendWhatsappForType(1, 'h1');
-
-        $countdown = $this->sendCountdownReminders();
+        $h3 = $this->dispatchForType(3, 'h3');
+        $h1 = $this->dispatchForType(1, 'h1');
+        $countdown = $this->dispatchCountdownReminders();
 
         return [
-            'h3_mail' => $h3Mail,
-            'h1_mail' => $h1Mail,
-            'h3_whatsapp' => $h3Whatsapp,
-            'h1_whatsapp' => $h1Whatsapp,
-            'countdown_mail' => $countdown['mail'],
-            'countdown_whatsapp' => $countdown['whatsapp'],
-            'total' => $h3Mail + $h1Mail + $h3Whatsapp + $h1Whatsapp + $countdown['mail'] + $countdown['whatsapp'],
+            'h3_telegram' => $h3,
+            'h1_telegram' => $h1,
+            'countdown_telegram' => $countdown,
+            'total' => $h3 + $h1 + $countdown,
         ];
     }
 
-    public function sendMailForType(int $days, string $type): int
+    public function dispatchForType(int $days, string $type): int
     {
-        $schedules = $this->getSchedulesForReminder($days, $type, 'mail');
-        $count = 0;
+        $schedules = $this->getSchedulesForReminder($days, $type);
 
         foreach ($schedules as $schedule) {
-            $notification = $type === 'h3'
-                ? new ScheduleH3Reminder($schedule)
-                : new ScheduleH1Reminder($schedule);
-
-            $schedule->user->notify($notification);
-
-            ReminderLog::create([
-                'user_id' => $schedule->user_id,
-                'jadwal_kegiatan_id' => $schedule->id,
-                'reminder_type' => $type,
-                'channel' => 'mail',
-                'sent_at' => now(),
-            ]);
-
-            $count++;
+            SendTelegramReminder::dispatch($schedule, $type);
         }
 
-        return $count;
+        return $schedules->count();
     }
 
-    public function sendWhatsappForType(int $days, string $type): int
+    public function dispatchCountdownReminders(): int
     {
-        $schedules = $this->getSchedulesForReminder($days, $type, 'whatsapp');
-        $count = 0;
-
-        foreach ($schedules as $schedule) {
-            if (! $this->whatsappReminderService->send($schedule->user, $schedule, $type)) {
-                continue;
-            }
-
-            ReminderLog::create([
-                'user_id' => $schedule->user_id,
-                'jadwal_kegiatan_id' => $schedule->id,
-                'reminder_type' => $type,
-                'channel' => 'whatsapp',
-                'sent_at' => now(),
-            ]);
-
-            $count++;
-        }
-
-        return $count;
-    }
-
-    public function sendCountdownReminders(): array
-    {
-        $start = now();
-        $end = now()->addHours(3);
-
         $schedules = JadwalKegiatan::query()
             ->with('user')
+            ->whereHas('user', fn ($query) => $query->whereNotNull('telegram_chat_id'))
             ->where('status', 'pending')
-            ->whereBetween('waktu_pelaksanaan', [$start, $end])
+            ->whereBetween('waktu_pelaksanaan', [now(), now()->addHours(3)])
             ->get();
 
-        $mailCount = 0;
-        $whatsappCount = 0;
+        $count = 0;
 
         foreach ($schedules as $schedule) {
-            $minutesRemaining = now()->diffInMinutes($schedule->waktu_pelaksanaan, false);
+            $minutesRemaining = (int) now()->diffInMinutes($schedule->waktu_pelaksanaan, false);
+
             if ($minutesRemaining <= 0 || $minutesRemaining > 180) {
                 continue;
             }
@@ -105,64 +54,33 @@ class ReminderService
             $slot = (int) ceil($minutesRemaining / 30);
             $type = "3h_slot_{$slot}";
 
-            // Send Mail
-            $mailLogExists = ReminderLog::where('jadwal_kegiatan_id', $schedule->id)
+            if ($schedule->reminderLogs()
                 ->where('reminder_type', $type)
-                ->where('channel', 'mail')
-                ->exists();
-
-            if (! $mailLogExists) {
-                $schedule->user->notify(new \App\Notifications\ScheduleCountdownReminder($schedule, $minutesRemaining));
-
-                ReminderLog::create([
-                    'user_id' => $schedule->user_id,
-                    'jadwal_kegiatan_id' => $schedule->id,
-                    'reminder_type' => $type,
-                    'channel' => 'mail',
-                    'sent_at' => now(),
-                ]);
-
-                $mailCount++;
+                ->where('channel', 'telegram')
+                ->exists()) {
+                continue;
             }
 
-            // Send WhatsApp
-            $whatsappLogExists = ReminderLog::where('jadwal_kegiatan_id', $schedule->id)
-                ->where('reminder_type', $type)
-                ->where('channel', 'whatsapp')
-                ->exists();
-
-            if (! $whatsappLogExists) {
-                if ($this->whatsappReminderService->send($schedule->user, $schedule, $type)) {
-                    ReminderLog::create([
-                        'user_id' => $schedule->user_id,
-                        'jadwal_kegiatan_id' => $schedule->id,
-                        'reminder_type' => $type,
-                        'channel' => 'whatsapp',
-                        'sent_at' => now(),
-                    ]);
-
-                    $whatsappCount++;
-                }
-            }
+            SendTelegramReminder::dispatch($schedule, $type, $minutesRemaining);
+            $count++;
         }
 
-        return [
-            'mail' => $mailCount,
-            'whatsapp' => $whatsappCount,
-        ];
+        return $count;
     }
 
-    public function getSchedulesForReminder(int $days, string $type, string $channel): Collection
+    public function getSchedulesForReminder(int $days, string $type): Collection
     {
         $start = now()->startOfDay()->addDays($days);
         $end = now()->endOfDay()->addDays($days);
 
         return JadwalKegiatan::query()
             ->with('user')
+            ->whereHas('user', fn ($query) => $query->whereNotNull('telegram_chat_id'))
             ->where('status', 'pending')
             ->whereBetween('waktu_pelaksanaan', [$start, $end])
-            ->whereDoesntHave('reminderLogs', function ($query) use ($type, $channel) {
-                $query->where('reminder_type', $type)->where('channel', $channel);
+            ->whereDoesntHave('reminderLogs', function ($query) use ($type) {
+                $query->where('reminder_type', $type)
+                    ->where('channel', 'telegram');
             })
             ->get();
     }

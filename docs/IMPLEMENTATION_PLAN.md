@@ -150,8 +150,7 @@ Checklist:
 
 - Create `ReminderService`.
 - Create `SendScheduleReminders` command.
-- Create `ScheduleH3Reminder` notification.
-- Create `ScheduleH1Reminder` notification.
+- Create `ScheduleTelegramReminder` notification.
 - Use `reminder_logs` to prevent duplicates.
 - Schedule command hourly.
 - Add tests for duplicate prevention.

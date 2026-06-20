@@ -17,7 +17,6 @@ class User extends Authenticatable
         'password',
         'google_id',
         'avatar',
-        'whatsapp_number',
     ];
 
     protected $hidden = [
@@ -30,7 +29,13 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'telegram_linked_at' => 'datetime',
         ];
+    }
+
+    public function routeNotificationForTelegram(): ?string
+    {
+        return $this->telegram_chat_id;
     }
 
     public function jadwalKegiatans(): HasMany

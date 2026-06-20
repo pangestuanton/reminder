@@ -105,8 +105,10 @@ Stores reminder sending history and prevents duplicate H-3/H-1 notifications.
 | `user_id` | foreign id | Yes | References `users.id`, cascade on delete |
 | `jadwal_kegiatan_id` | foreign id | Yes | References `jadwal_kegiatans.id`, cascade on delete |
 | `reminder_type` | string | Yes | `h3` or `h1` |
-| `channel` | string | Yes | Example: `mail`, `database` |
-| `sent_at` | timestamp | Yes | When reminder was sent |
+| `channel` | string | Yes | Always `telegram` |
+| `status` | string | Yes | `sent` or `failed` |
+| `sent_at` | timestamp | No | When reminder was sent |
+| `failed_at` | timestamp | No | When all delivery attempts failed |
 | `created_at` | timestamp | Yes | Auto-managed |
 | `updated_at` | timestamp | Yes | Auto-managed |
 
@@ -207,7 +209,7 @@ Schema::create('reminder_logs', function (Blueprint $table) {
     $table->foreignId('user_id')->constrained()->cascadeOnDelete();
     $table->foreignId('jadwal_kegiatan_id')->constrained('jadwal_kegiatans')->cascadeOnDelete();
     $table->string('reminder_type');
-    $table->string('channel')->default('mail');
+    $table->string('channel')->default('telegram');
     $table->timestamp('sent_at');
     $table->timestamps();
 

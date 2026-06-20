@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('jadwal_kegiatan_id')->constrained('jadwal_kegiatans')->cascadeOnDelete();
             $table->string('reminder_type');
-            $table->string('channel')->default('mail');
+            $table->string('channel')->default('telegram');
             $table->timestamp('sent_at');
             $table->timestamps();
 
