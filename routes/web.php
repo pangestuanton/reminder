@@ -180,7 +180,7 @@ Route::middleware('auth')->group(function () {
     })->name('debug.classroom');
 
     // Force-sync classroom synchronously (no queue) — for Railway debugging
-    Route::get('/debug/classroom/sync', function (\App\Services\GoogleClassroomService $classroomService) {
+    Route::get('/debug/classroom/sync', function (\App\Services\GoogleClassroomService $classroomService, \App\Services\GoogleTokenService $tokenService) {
         $user = auth()->user();
         $output = ['user_id' => $user->id, 'steps' => []];
 
@@ -198,12 +198,34 @@ Route::middleware('auth')->group(function () {
             return response()->json($output, 200, [], JSON_PRETTY_PRINT);
         }
 
-        // Step 2: sync course works
+        // Step 2: probe each course individually for courseWork
+        $token = $tokenService->getAccessToken($user->googleAccount);
+        $http = new \GuzzleHttp\Client(['verify' => false, 'timeout' => 10]);
+        $perCourse = [];
+        foreach (\App\Models\GoogleClassroomCourse::ownedBy($user)->active()->get() as $course) {
+            try {
+                $resp = $http->get("https://classroom.googleapis.com/v1/courses/{$course->external_id}/courseWork", [
+                    'headers' => ['Authorization' => 'Bearer ' . $token],
+                    'query'   => ['pageSize' => 10],
+                ]);
+                $data = json_decode($resp->getBody()->getContents(), true);
+                $perCourse[$course->name] = ['count' => count($data['courseWork'] ?? []), 'error' => null];
+            } catch (\Throwable $e) {
+                $perCourse[$course->name] = ['count' => 0, 'error' => $e->getMessage()];
+            }
+        }
+        $output['per_course_api_result'] = $perCourse;
+
+        // Step 3: sync course works
         $workResult = $classroomService->syncCourseWork($user);
         $output['steps'][] = ['sync_course_works' => $workResult];
 
         $output['db_courses_count']      = \App\Models\GoogleClassroomCourse::ownedBy($user)->count();
         $output['db_course_works_count'] = \App\Models\GoogleClassroomCourseWork::ownedBy($user)->count();
+        $output['db_course_works']       = \App\Models\GoogleClassroomCourseWork::ownedBy($user)
+            ->orderBy('due_date')->get()
+            ->map(fn($w) => ['id' => $w->id, 'title' => $w->title, 'due_date' => $w->due_date, 'status' => $w->status])
+            ->toArray();
         $output['message'] = 'Sync complete. Refresh /classroom to see your tasks.';
 
         return response()->json($output, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

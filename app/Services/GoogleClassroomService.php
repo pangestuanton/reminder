@@ -88,25 +88,37 @@ class GoogleClassroomService
         $courses = GoogleClassroomCourse::where('user_id', $user->id)->active()->get();
         $synced = 0;
 
+        Log::info('Starting courseWork sync', [
+            'user_id'      => $user->id,
+            'course_count' => $courses->count(),
+        ]);
+
         foreach ($courses as $course) {
             try {
                 $works = $this->fetchCourseWork($token, $course->external_id);
+
+                Log::info('CourseWork fetched for course', [
+                    'user_id'    => $user->id,
+                    'course'     => $course->name,
+                    'course_id'  => $course->external_id,
+                    'work_count' => count($works),
+                ]);
 
                 foreach ($works as $workData) {
                     $courseWork = GoogleClassroomCourseWork::updateOrCreate(
                         ['user_id' => $user->id, 'external_id' => $workData['id']],
                         [
                             'google_classroom_course_id' => $course->id,
-                            'title' => $workData['title'] ?? '',
-                            'description' => $workData['description'] ?? null,
-                            'due_date' => $this->parseDueDate($workData['dueDate'] ?? null),
-                            'due_time_only' => $this->parseDueTime($workData['dueTime'] ?? null),
-                            'max_points' => $workData['maxPoints'] ?? null,
-                            'work_type' => $workData['workType'] ?? 'ASSIGNMENT',
-                            'status' => $workData['state'] ?? 'PUBLISHED',
-                            'alternate_link' => $workData['alternateLink'] ?? null,
-                            'materials' => $this->extractMaterials($workData['materials'] ?? []),
-                            'synced_at' => now(),
+                            'title'        => $workData['title'] ?? '',
+                            'description'  => $workData['description'] ?? null,
+                            'due_date'     => $this->parseDueDate($workData['dueDate'] ?? null),
+                            'due_time_only'=> $this->parseDueTime($workData['dueTime'] ?? null),
+                            'max_points'   => $workData['maxPoints'] ?? null,
+                            'work_type'    => $workData['workType'] ?? 'ASSIGNMENT',
+                            'status'       => $workData['state'] ?? 'PUBLISHED',
+                            'alternate_link'=> $workData['alternateLink'] ?? null,
+                            'materials'    => $this->extractMaterials($workData['materials'] ?? []),
+                            'synced_at'    => now(),
                         ]
                     );
 
@@ -117,12 +129,19 @@ class GoogleClassroomService
                 }
             } catch (\Throwable $e) {
                 Log::warning('CourseWork sync failed for course', [
-                    'user_id' => $user->id,
-                    'course_external_id' => $course->external_id,
-                    'error' => $e->getMessage(),
+                    'user_id'          => $user->id,
+                    'course'           => $course->name,
+                    'course_external_id'=> $course->external_id,
+                    'error'            => $e->getMessage(),
+                    'code'             => $e->getCode(),
                 ]);
             }
         }
+
+        Log::info('CourseWork sync complete', [
+            'user_id'     => $user->id,
+            'total_synced'=> $synced,
+        ]);
 
         return ['course_works' => $synced];
     }
