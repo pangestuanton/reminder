@@ -92,8 +92,11 @@ class JadwalKegiatanController extends Controller
     {
         $this->authorize('complete', $jadwalKegiatan);
 
-        $jadwalKegiatan->update(['status' => 'selesai']);
+        $jadwalKegiatan->update([
+            'status' => 'selesai',
+            'completed_at' => now(),
+        ]);
 
-        return back()->with('success', 'Jadwal berhasil ditandai selesai.');
+        return back()->with('success', 'Tugas berhasil ditandai selesai.');
     }
 }

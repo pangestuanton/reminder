@@ -9,7 +9,18 @@
 
 ## About Aviona Sync
 
-Aviona Sync adalah aplikasi manajemen jadwal kegiatan dengan integrasi Google Login dan pengingat otomatis melalui Telegram Bot.
+Aviona Sync adalah aplikasi manajemen jadwal dan tugas akademik dengan integrasi Google Classroom, Google Calendar, dan pengingat otomatis via Telegram Bot.
+
+## Fitur Utama
+
+- **Tugas & Deadline**: Kelola tugas dari lokal, Google Classroom, dan Google Calendar
+- **Jadwal Kuliah**: Jadwal kuliah mingguan berulang yang otomatis
+- **Google Classroom**: Sinkronisasi kursus, coursework, dan status pengumpulan
+- **Google Calendar**: Impor acara, ekspor tugas & jadwal kuliah
+- **Pengingat Telegram**: Pesan kontekstual sesuai kategori kegiatan
+- **Agenda Harian**: Ringkasan aktivitas dikirim setiap jam 05:00
+- **Analitik Progres**: Statistik penyelesaian tugas dan tren mingguan
+- **Pengaturan**: Kustomisasi notifikasi, jam senyap, format pesan
 
 ## Deployment ke Railway
 
@@ -52,17 +63,25 @@ TELEGRAM_BOT_USERNAME=your_bot_username
 TELEGRAM_WEBHOOK_SECRET=your-random-webhook-secret
 ```
 
-> **Tip:** Di Railway, variabel `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` otomatis tersedia jika kamu pakai PostgreSQL plugin Railway. Gunakan `${{PostgreSQL.DATABASE_URL}}` atau set manual.
+### Google API Setup
+
+1. Buka [Google Cloud Console](https://console.cloud.google.com)
+2. Buat project baru atau pilih project yang sudah ada
+3. Aktifkan **Google Classroom API** dan **Google Calendar API**
+4. Buat OAuth 2.0 credentials
+5. Set authorized redirect URI: `https://your-app-url/auth/google/callback`
+6. Tambahkan scopes:
+   - `https://www.googleapis.com/auth/classroom.courses.readonly`
+   - `https://www.googleapis.com/auth/classroom.coursework.me.readonly`
+   - `https://www.googleapis.com/auth/classroom.student-submissions.me.readonly`
+   - `https://www.googleapis.com/auth/calendar`
+7. Publish app ke production agar tidak perlu approval manual
 
 ### Build & Start Command
 
-Railway otomatis menggunakan Nixpacks untuk mendeteksi PHP + Node.js. Build process:
+Railway otomatis menggunakan Nixpacks untuk mendeteksi PHP + Node.js.
 
-1. `composer install --no-dev --optimize-autoloader`
-2. `npm install && npm run build`
-3. Start: `php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && php -S 0.0.0.0:$PORT -t public`
-
-### Worker Service (Scheduler)
+### Worker Service
 
 Tambahkan service kedua di Railway dengan command:
 
@@ -70,13 +89,22 @@ Tambahkan service kedua di Railway dengan command:
 php artisan schedule:work
 ```
 
+### Queue Worker
+
 Tambahkan service ketiga untuk queue worker:
 
 ```
-php artisan queue:work --queue=telegram --tries=3 --timeout=30
+php artisan queue:work --queue=telegram,default --tries=3 --timeout=30
 ```
 
-Scheduler mengantrekan pengingat H-3, H-1, dan hitung mundur tiga jam. Queue worker mengirim semuanya melalui Telegram.
+### Scheduler
+
+Scheduler mengantrekan:
+- Pengingat H-3, H-1, dan hitung mundur 3 jam (setiap menit)
+- Agenda harian jam 05:00 WIB (sekali sehari)
+- Sinkronisasi Google Classroom & Calendar (setiap 15 menit)
+
+### Webhook Telegram
 
 Setelah deployment pertama, daftarkan webhook Telegram:
 
@@ -84,7 +112,7 @@ Setelah deployment pertama, daftarkan webhook Telegram:
 php artisan telegram:set-webhook
 ```
 
-### Setup Lokal
+## Setup Lokal
 
 ```bash
 git clone https://github.com/pangestuanton/reminder.git
@@ -96,6 +124,13 @@ php artisan migrate
 npm install
 npm run build
 php artisan serve
+```
+
+## Testing
+
+```bash
+php artisan test
+npm run build
 ```
 
 ## License

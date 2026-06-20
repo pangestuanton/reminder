@@ -2,19 +2,47 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AnalyticsService;
 use App\Services\DashboardStatsService;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __construct(private readonly DashboardStatsService $dashboardStatsService) {}
+    public function __construct(
+        private readonly DashboardStatsService $dashboardStatsService,
+        private readonly AnalyticsService $analyticsService,
+    ) {}
 
     public function index(): View
     {
-        $stats = $this->dashboardStatsService->get(auth()->user());
+        $user = auth()->user();
+        $stats = $this->dashboardStatsService->get($user);
+
+        $todayClasses = \App\Models\CollegeSchedule::where('user_id', $user->id)
+            ->active()
+            ->currentSemester()
+            ->forDay(now()->translatedFormat('l'))
+            ->orderBy('jam_mulai')
+            ->get();
+
+        $todayEvents = \App\Models\GoogleCalendarEvent::where('user_id', $user->id)
+            ->forDate(now())
+            ->orderBy('start_datetime')
+            ->get();
+
+        $analytics = $this->analyticsService->getStats($user);
+
+        $recentNotifications = \App\Models\NotificationLog::where('user_id', $user->id)
+            ->orderByDesc('sent_at')
+            ->limit(5)
+            ->get();
 
         return view('dashboard.index', [
             ...$stats,
+            'todayClasses' => $todayClasses,
+            'todayEvents' => $todayEvents,
+            'analytics' => $analytics,
+            'recentNotifications' => $recentNotifications,
             'countdownText' => $this->dashboardStatsService->countdownText($stats['nearest']),
         ]);
     }

@@ -1,40 +1,40 @@
 <x-layouts.app title="Dashboard - Aviona Sync">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Halo, {{ auth()->user()->name }}! 👋</h1>
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Halo, {{ auth()->user()->name }}!</h1>
             <p class="mt-1 text-sm text-slate-500">Pantau jadwal, tenggat terdekat, dan aktivitas pentingmu di satu tempat.</p>
         </div>
         <a href="{{ route('jadwal-kegiatan.create') }}">
-            <x-button>Tambah Jadwal</x-button>
+            <x-button>Tambah Tugas</x-button>
         </a>
     </div>
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <x-card>
             <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-50 text-pink-500">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z"/></svg>
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 </div>
                 <div>
-                    <p class="text-sm text-slate-500">Total Jadwal</p>
+                    <p class="text-sm text-slate-500">Total Tugas</p>
                     <p class="text-2xl font-bold text-slate-900">{{ $total }}</p>
                 </div>
             </div>
         </x-card>
         <x-card>
             <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-500">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-50 text-yellow-600">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div>
                     <p class="text-sm text-slate-500">Menunggu</p>
-                    <p class="text-2xl font-bold text-amber-600">{{ $pending }}</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ $pending }}</p>
                 </div>
             </div>
         </x-card>
         <x-card>
             <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div>
@@ -45,7 +45,7 @@
         </x-card>
         <x-card>
             <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-500">
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
                 </div>
                 <div>
@@ -56,9 +56,87 @@
         </x-card>
     </div>
 
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <x-card>
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-semibold text-slate-900">Progres Mingguan</h3>
+                <span class="text-2xl font-bold text-blue-600">{{ $analytics['percentage'] }}%</span>
+            </div>
+            <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full rounded-full bg-blue-600 transition-all" style="width: {{ $analytics['percentage'] }}%"></div>
+            </div>
+            <p class="mt-2 text-xs text-slate-500">{{ $analytics['completed'] }} dari {{ $analytics['total'] }} tugas selesai</p>
+        </x-card>
+
+        <x-card>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-900">Agenda Hari Ini</h3>
+                    <p class="mt-1 text-xs text-slate-500">{{ $todayClasses->count() }} kelas, {{ $todayEvents->count() }} acara</p>
+                </div>
+                <a href="{{ route('calendar.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">Lihat</a>
+            </div>
+        </x-card>
+
+        <x-card>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-900">Integrasi</h3>
+                    <p class="mt-1 text-xs text-slate-500">{{ auth()->user()->hasClassroomAccess() ? 'Classroom aktif' : 'Classroom tidak terhubung' }}</p>
+                </div>
+                <a href="{{ route('integrations.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700">Kelola</a>
+            </div>
+        </x-card>
+    </div>
+
+    @if ($todayClasses->isNotEmpty())
+        <x-card>
+            <h3 class="text-lg font-semibold text-slate-900">Kuliah Hari Ini</h3>
+            <div class="mt-4 space-y-3">
+                @foreach ($todayClasses as $class)
+                    <div class="flex items-center gap-4 rounded-2xl bg-blue-50/50 p-4 transition hover:bg-blue-50">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-sm font-bold text-blue-700">
+                            {{ substr($class->jam_mulai, 0, 5) }}
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-slate-900">{{ $class->mata_kuliah }}</h4>
+                            <p class="text-sm text-slate-500">
+                                @if ($class->dosen) {{ $class->dosen }} &middot; @endif
+                                {{ $class->lokasi ?? 'Online' }}
+                            </p>
+                        </div>
+                        <span class="text-xs text-slate-400">{{ $class->jam_mulai }}-{{ $class->jam_selesai }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </x-card>
+    @endif
+
+    @if ($todayEvents->isNotEmpty())
+        <x-card>
+            <h3 class="text-lg font-semibold text-slate-900">Acara Kalender</h3>
+            <div class="mt-4 space-y-3">
+                @foreach ($todayEvents as $event)
+                    <div class="flex items-center gap-4 rounded-2xl bg-amber-50/50 p-4 transition hover:bg-amber-50">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-sm font-bold text-amber-700">
+                            📅
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-slate-900">{{ $event->title }}</h4>
+                            <p class="text-sm text-slate-500">
+                                @if ($event->is_all_day) Sepanjang hari @else {{ $event->start_datetime->format('H.i') }} - {{ $event->end_datetime->format('H.i') }} @endif
+                                @if ($event->location) &middot; {{ $event->location }} @endif
+                            </p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </x-card>
+    @endif
+
     @if (! $total)
-        <x-empty-state title="Belum ada jadwal" description="Tambahkan jadwal pertama agar aktivitas kuliah dan organisasimu lebih teratur.">
-            <a href="{{ route('jadwal-kegiatan.create') }}"><x-button>Tambah Jadwal</x-button></a>
+        <x-empty-state title="Belum ada tugas" description="Tambahkan tugas pertama agar aktivitas kuliah dan organisasimu lebih teratur.">
+            <a href="{{ route('jadwal-kegiatan.create') }}"><x-button>Tambah Tugas</x-button></a>
         </x-empty-state>
     @else
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -66,20 +144,23 @@
                 <x-card>
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <p class="text-sm text-slate-500">Jadwal Terdekat</p>
+                            <p class="text-sm text-slate-500">Tugas Terdekat</p>
                             @if ($nearest)
                                 <h2 class="mt-2 text-xl font-semibold text-slate-900">{{ $nearest->judul }}</h2>
-                                <p class="mt-2 text-sm text-slate-600">{{ $nearest->waktu_pelaksanaan->translatedFormat('l, d F Y • H.i') }}</p>
-                                <p class="mt-3 text-sm font-medium text-pink-600">{{ app(\App\Services\DashboardStatsService::class)->countdownText($nearest) }}</p>
+                                <p class="mt-2 text-sm text-slate-600">{{ $nearest->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') }}</p>
+                                <p class="mt-3 text-sm font-medium text-blue-600">{{ $countdownText }}</p>
                                 <div class="mt-4 flex flex-wrap gap-2">
                                     <x-badge>{{ ucfirst($nearest->kategori) }}</x-badge>
                                     <x-badge type="pending">Menunggu</x-badge>
+                                    @if ($nearest->source !== 'local')
+                                        <x-badge type="blue">{{ $nearest->source_label }}</x-badge>
+                                    @endif
                                     @if ($nearest->daysUntilDue() <= 3)
-                                        <x-badge type="mendesak">Pengingat aktif</x-badge>
+                                        <x-badge type="mendesak">Mendesak</x-badge>
                                     @endif
                                 </div>
                             @else
-                                <p class="mt-2 text-sm text-slate-500">Belum ada jadwal mendatang.</p>
+                                <p class="mt-2 text-sm text-slate-500">Belum ada tugas mendatang.</p>
                             @endif
                         </div>
                         @if ($nearest)
@@ -90,16 +171,19 @@
 
                 <x-card>
                     <div class="mb-4 flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-slate-900">Jadwal Berikutnya</h3>
-                        <a href="{{ route('jadwal-kegiatan.index') }}" class="text-sm font-semibold text-pink-600 hover:text-pink-700">Lihat semua</a>
+                        <h3 class="text-lg font-semibold text-slate-900">Tugas Berikutnya</h3>
+                        <a href="{{ route('jadwal-kegiatan.index') }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700">Lihat semua</a>
                     </div>
                     <div class="space-y-4">
                         @forelse ($upcoming as $jadwal)
-                            <div class="rounded-2xl bg-pink-50/30 p-4 transition hover:bg-pink-50/60">
+                            <div class="rounded-2xl bg-blue-50/30 p-4 transition hover:bg-blue-50/60">
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                     <div>
                                         <div class="flex flex-wrap gap-2">
                                             <x-badge>{{ ucfirst($jadwal->kategori) }}</x-badge>
+                                            @if ($jadwal->source !== 'local')
+                                                <x-badge type="blue">{{ $jadwal->source_label }}</x-badge>
+                                            @endif
                                             @if ($jadwal->isOverdue())
                                                 <x-badge type="terlambat">Terlambat</x-badge>
                                             @elseif ($jadwal->daysUntilDue() <= 3)
@@ -107,41 +191,58 @@
                                             @endif
                                         </div>
                                         <h4 class="mt-3 font-semibold text-slate-900">{{ $jadwal->judul }}</h4>
-                                        <p class="mt-1 text-sm text-slate-500">{{ $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y • H.i') }}</p>
+                                        <p class="mt-1 text-sm text-slate-500">{{ $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') }}</p>
                                     </div>
-                                    <a href="{{ route('jadwal-kegiatan.show', $jadwal) }}" class="text-sm font-semibold text-pink-600">Detail</a>
+                                    <a href="{{ route('jadwal-kegiatan.show', $jadwal) }}" class="text-sm font-semibold text-blue-600">Detail</a>
                                 </div>
                             </div>
                         @empty
-                            <p class="text-sm text-slate-500">Belum ada jadwal terdekat.</p>
+                            <p class="text-sm text-slate-500">Belum ada tugas terdekat.</p>
                         @endforelse
                     </div>
                 </x-card>
             </div>
 
-            <x-card>
-                <h3 class="text-lg font-semibold text-slate-900">Tenggat Mendesak</h3>
-                <p class="mt-1 text-sm text-slate-500">Jadwal yang membutuhkan perhatianmu dalam 7 hari ke depan.</p>
-                <div class="mt-5 space-y-4">
-                    @forelse ($urgentList as $jadwal)
-                        <div class="rounded-2xl bg-amber-50 p-4 transition hover:bg-amber-100/60">
-                            <div class="flex items-start justify-between gap-3">
-                                <div>
-                                    <div class="flex flex-wrap gap-2">
-                                        <x-badge type="mendesak">Mendesak</x-badge>
-                                        <x-badge>{{ ucfirst($jadwal->kategori) }}</x-badge>
+            <div class="space-y-6">
+                <x-card>
+                    <h3 class="text-lg font-semibold text-slate-900">Tenggat Mendesak</h3>
+                    <p class="mt-1 text-sm text-slate-500">Tugas yang membutuhkan perhatianmu dalam 7 hari ke depan.</p>
+                    <div class="mt-5 space-y-4">
+                        @forelse ($urgentList as $jadwal)
+                            <div class="rounded-2xl bg-yellow-50 p-4 transition hover:bg-yellow-100/60">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <div class="flex flex-wrap gap-2">
+                                            <x-badge type="mendesak">Mendesak</x-badge>
+                                            <x-badge>{{ ucfirst($jadwal->kategori) }}</x-badge>
+                                        </div>
+                                        <h4 class="mt-3 font-semibold text-slate-900">{{ $jadwal->judul }}</h4>
+                                        <p class="mt-1 text-sm text-slate-600">{{ $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y \a\t H.i') }}</p>
+                                        <p class="mt-2 text-sm font-medium text-yellow-700">{{ $countdownText }}</p>
                                     </div>
-                                    <h4 class="mt-3 font-semibold text-slate-900">{{ $jadwal->judul }}</h4>
-                                    <p class="mt-1 text-sm text-slate-600">{{ $jadwal->waktu_pelaksanaan->translatedFormat('l, d F Y • H.i') }}</p>
-                                    <p class="mt-2 text-sm font-medium text-amber-700">{{ app(\App\Services\DashboardStatsService::class)->countdownText($jadwal) }}</p>
                                 </div>
                             </div>
+                        @empty
+                            <p class="text-sm text-slate-500">Belum ada tugas mendesak hari ini.</p>
+                        @endforelse
+                    </div>
+                </x-card>
+
+                @if ($recentNotifications->isNotEmpty())
+                    <x-card>
+                        <h3 class="text-lg font-semibold text-slate-900">Notifikasi Terakhir</h3>
+                        <div class="mt-4 space-y-3">
+                            @foreach ($recentNotifications as $log)
+                                <div class="flex items-center gap-3 text-sm">
+                                    <span class="h-2 w-2 rounded-full {{ $log->status === 'sent' ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
+                                    <span class="text-slate-600">{{ ucfirst(str_replace('_', ' ', $log->notification_type)) }}</span>
+                                    <span class="ml-auto text-xs text-slate-400">{{ $log->sent_at?->diffForHumans() }}</span>
+                                </div>
+                            @endforeach
                         </div>
-                    @empty
-                        <p class="text-sm text-slate-500">Belum ada tugas mendesak hari ini.</p>
-                    @endforelse
-                </div>
-            </x-card>
+                    </x-card>
+                @endif
+            </div>
         </div>
     @endif
 </x-layouts.app>

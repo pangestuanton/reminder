@@ -21,6 +21,7 @@ class JadwalKegiatanFactory extends Factory
             'deskripsi' => fake()->optional(0.5)->paragraph(1),
             'status' => 'pending',
             'prioritas' => fake()->randomElement(['rendah', 'sedang', 'tinggi']),
+            'source' => 'local',
         ];
     }
 

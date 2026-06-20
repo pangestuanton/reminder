@@ -1,7 +1,9 @@
 <?php
 
+use App\Console\Commands\SendDailyAgenda;
 use App\Console\Commands\SendScheduleReminders;
 use App\Console\Commands\SetTelegramWebhook;
+use App\Console\Commands\SyncGoogleIntegrations;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
         SendScheduleReminders::class,
         SetTelegramWebhook::class,
+        SendDailyAgenda::class,
+        SyncGoogleIntegrations::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
