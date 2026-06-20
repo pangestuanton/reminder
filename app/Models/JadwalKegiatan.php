@@ -145,6 +145,10 @@ class JadwalKegiatan extends Model
 
     public function getCountdownTextAttribute(): ?string
     {
+        if ($this->status === 'selesai') {
+            return null;
+        }
+
         if ($this->isOverdue()) {
             return 'Tenggat sudah terlewat.';
         }
@@ -155,19 +159,25 @@ class JadwalKegiatan extends Model
 
         $diffInMinutes = (int) round(now()->diffInMinutes($this->waktu_pelaksanaan, false));
 
+        if ($diffInMinutes < 0) {
+            return 'Tenggat sudah terlewat.';
+        }
+
+        $prefix = $this->kategori === 'kuliah' ? 'Dimulai' : 'Tenggat';
+
         if ($diffInMinutes < 60) {
-            return 'Dimulai dalam kurang dari 1 jam.';
+            return $prefix . ' dalam kurang dari 1 jam.';
         }
 
         $diffInHours = (int) round(now()->diffInHours($this->waktu_pelaksanaan, false));
 
         if ($diffInHours < 24) {
-            return 'Tenggat dalam '.$diffInHours.' jam.';
+            return $prefix . ' dalam ' . $diffInHours . ' jam.';
         }
 
         $diffInDays = (int) round(now()->diffInDays($this->waktu_pelaksanaan, false));
 
-        return 'Tenggat dalam '.$diffInDays.' hari.';
+        return $prefix . ' dalam ' . $diffInDays . ' hari.';
     }
 
     public function getEffectiveDeadline()

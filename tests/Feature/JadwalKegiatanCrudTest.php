@@ -85,4 +85,40 @@ class JadwalKegiatanCrudTest extends TestCase
         $response->assertSee('Kuliah Laravel');
         $response->assertDontSee('Tugas Basis Data');
     }
+
+    public function test_countdown_text_behavior(): void
+    {
+        $user = User::factory()->create();
+
+        // 1. Completed task should have null countdown text
+        $completedTask = JadwalKegiatan::factory()->for($user)->create([
+            'waktu_pelaksanaan' => now()->addMinutes(30),
+            'status' => 'selesai',
+        ]);
+        $this->assertNull($completedTask->countdown_text);
+
+        // 2. Overdue pending task should say 'Tenggat sudah terlewat.'
+        $overdueTask = JadwalKegiatan::factory()->for($user)->create([
+            'waktu_pelaksanaan' => now()->subMinutes(30),
+            'status' => 'pending',
+        ]);
+        $this->assertEquals('Tenggat sudah terlewat.', $overdueTask->countdown_text);
+
+        // 3. Pending tugas due in 30 mins should say 'Tenggat dalam kurang dari 1 jam.'
+        $tugasTask = JadwalKegiatan::factory()->for($user)->create([
+            'waktu_pelaksanaan' => now()->addMinutes(30),
+            'kategori' => 'tugas',
+            'status' => 'pending',
+        ]);
+        $this->assertEquals('Tenggat dalam kurang dari 1 jam.', $tugasTask->countdown_text);
+
+        // 4. Pending kuliah starting in 30 mins should say 'Dimulai dalam kurang dari 1 jam.'
+        $kuliahTask = JadwalKegiatan::factory()->for($user)->create([
+            'waktu_pelaksanaan' => now()->addMinutes(30),
+            'kategori' => 'kuliah',
+            'status' => 'pending',
+        ]);
+        $this->assertEquals('Dimulai dalam kurang dari 1 jam.', $kuliahTask->countdown_text);
+    }
 }
+
