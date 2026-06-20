@@ -3,61 +3,16 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="id" x-data="{
-    themeMode: '{{ $userTheme ?? 'system' }}',
-    darkMode: false,
-    initTheme() {
-        const stored = localStorage.getItem('theme');
-        this.themeMode = stored || '{{ $userTheme ?? 'system' }}';
-        this.applyTheme();
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            if (this.themeMode === 'system') this.applyTheme();
-        });
-        this.$watch('themeMode', (val) => {
-            localStorage.setItem('theme', val);
-            this.applyTheme();
-            this.syncTheme(val);
-        });
-    },
-    applyTheme() {
-        if (this.themeMode === 'system') {
-            this.darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        } else {
-            this.darkMode = this.themeMode === 'dark';
-        }
-        document.documentElement.classList.toggle('dark', this.darkMode);
-    },
-    setTheme(mode) {
-        this.themeMode = mode;
-    },
-    cycleTheme() {
-        const modes = ['light', 'dark', 'system'];
-        const next = modes[(modes.indexOf(this.themeMode) + 1) % modes.length];
-        this.setTheme(next);
-    },
-    syncTheme(mode) {
-        const token = document.querySelector('meta[name=\"csrf-token\"]');
-        if (token) {
-            fetch('/theme', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token.content,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ theme: mode })
-            }).catch(() => {});
-        }
-    }
-}" x-init="initTheme()" :class="{ 'dark': darkMode }" x-cloak>
+<html lang="id" x-data="themeApp()" x-init="initTheme()" :class="{ 'dark': darkMode }" x-cloak>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-preference" content="{{ $userTheme ?? 'system' }}">
     <title>{{ $title ?? 'Aviona Sync' }}</title>
     <script>
         (function() {
-            var mode = localStorage.getItem('theme') || '{{ $userTheme ?? 'system' }}';
+            var mode = localStorage.getItem('theme') || '{{ addslashes($userTheme ?? 'system') }}';
             if (mode === 'system') {
                 mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
