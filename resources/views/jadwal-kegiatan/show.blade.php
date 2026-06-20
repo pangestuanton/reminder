@@ -23,6 +23,16 @@
                         <x-button type="submit" variant="secondary">Ekspor ke Calendar</x-button>
                     </form>
                 @endif
+                <x-modal message="Tugas yang dihapus tidak bisa dikembalikan.">
+                    <x-slot:trigger>
+                        <x-button type="button" variant="danger">Hapus</x-button>
+                    </x-slot:trigger>
+                    <form method="POST" action="{{ route('jadwal-kegiatan.destroy', $jadwalKegiatan) }}">
+                        @csrf
+                        @method('DELETE')
+                        <x-button variant="danger" type="submit">Ya, Hapus</x-button>
+                    </form>
+                </x-modal>
             </div>
         </div>
 

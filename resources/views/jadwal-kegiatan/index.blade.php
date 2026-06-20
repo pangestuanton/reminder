@@ -116,18 +116,16 @@
                                 <x-button type="submit">Selesai</x-button>
                             </form>
                         @endif
-                        @if ($jadwal->source === 'local')
-                            <x-modal message="Tugas yang dihapus tidak bisa dikembalikan.">
-                                <x-slot:trigger>
-                                    <button type="button" class="inline-flex items-center justify-center rounded-2xl bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-100">Hapus</button>
-                                </x-slot:trigger>
-                                <form method="POST" action="{{ route('jadwal-kegiatan.destroy', $jadwal) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <x-button variant="danger" type="submit">Ya, Hapus</x-button>
-                                </form>
-                            </x-modal>
-                        @endif
+                        <x-modal message="Tugas yang dihapus tidak bisa dikembalikan.">
+                            <x-slot:trigger>
+                                <button type="button" class="inline-flex items-center justify-center rounded-2xl bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-100">Hapus</button>
+                            </x-slot:trigger>
+                            <form method="POST" action="{{ route('jadwal-kegiatan.destroy', $jadwal) }}">
+                                @csrf
+                                @method('DELETE')
+                                <x-button variant="danger" type="submit">Ya, Hapus</x-button>
+                            </form>
+                        </x-modal>
                     </div>
                 </div>
             </x-card>
