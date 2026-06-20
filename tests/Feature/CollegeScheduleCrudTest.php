@@ -116,4 +116,26 @@ class CollegeScheduleCrudTest extends TestCase
             'jam_selesai' => '10:00',
         ])->assertSessionHasErrors('hari');
     }
+
+    public function test_can_download_pdf_for_college_schedule(): void
+    {
+        $user = User::factory()->create();
+        CollegeSchedule::factory()->for($user)->create([
+            'mata_kuliah' => 'Struktur Data',
+            'hari' => 'Selasa',
+            'jam_mulai' => '08:00',
+            'jam_selesai' => '09:40',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('college-schedule.pdf'));
+        
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+    }
+
+    public function test_guest_cannot_download_pdf(): void
+    {
+        $this->get(route('college-schedule.pdf'))
+            ->assertRedirect(route('login'));
+    }
 }

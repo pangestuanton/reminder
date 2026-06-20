@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCollegeScheduleRequest;
 use App\Http\Requests\UpdateCollegeScheduleRequest;
 use App\Models\CollegeSchedule;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -85,5 +86,22 @@ class CollegeScheduleController extends Controller
         $status = $collegeSchedule->is_active ? 'diaktifkan' : 'dinonaktifkan';
 
         return back()->with('success', "Jadwal kuliah berhasil {$status}.");
+    }
+
+    public function downloadPdf(Request $request): \Illuminate\Http\Response
+    {
+        $schedules = CollegeSchedule::ownedBy($request->user())
+            ->active()
+            ->currentSemester()
+            ->orderBy('hari')
+            ->orderBy('jam_mulai')
+            ->get();
+
+        $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+        $grouped = $schedules->groupBy('hari');
+
+        $pdf = Pdf::loadView('college-schedule.pdf', compact('schedules', 'grouped', 'days'));
+
+        return $pdf->download('jadwal-kuliah.pdf');
     }
 }

@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/jadkul', [CollegeScheduleController::class, 'index'])->name('college-schedule.index');
     Route::get('/jadkul/create', [CollegeScheduleController::class, 'create'])->name('college-schedule.create');
+    Route::get('/jadkul/pdf', [CollegeScheduleController::class, 'downloadPdf'])->name('college-schedule.pdf');
     Route::post('/jadkul', [CollegeScheduleController::class, 'store'])->name('college-schedule.store');
     Route::get('/jadkul/{collegeSchedule}', [CollegeScheduleController::class, 'show'])->name('college-schedule.show');
     Route::get('/jadkul/{collegeSchedule}/edit', [CollegeScheduleController::class, 'edit'])->name('college-schedule.edit');

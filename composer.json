@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.1",
         "laravel-notification-channels/telegram": "^6.0",
         "laravel/framework": "^11.54",
         "laravel/socialite": "^5.28",
