@@ -1,7 +1,9 @@
 <nav x-data="{ open: false }" class="border-b border-blue-100/50 bg-white/90 backdrop-blur">
     <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-600 text-sm font-bold text-white shadow-sm">AS</div>
+            <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white p-1 shadow-sm border border-slate-100">
+                <img src="{{ asset('images/logo.png') }}" alt="AS" class="h-full w-full object-contain rounded-xl">
+            </div>
             <div>
                 <div class="text-sm font-semibold text-slate-900">Aviona Sync</div>
                 <div class="text-xs text-slate-500">Pusat jadwal akademikmu</div>
