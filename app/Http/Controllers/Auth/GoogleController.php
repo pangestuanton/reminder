@@ -18,6 +18,7 @@ class GoogleController extends Controller
     {
         return Socialite::driver('google')
             ->stateless()
+            ->redirectUrl(route('google.callback'))
             ->setHttpClient(new Client(['verify' => false]));
     }
 
