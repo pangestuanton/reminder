@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Railway terminates SSL at its reverse proxy, so PHP sees HTTP.
         // Force HTTPS for all generated URLs in production.
-        if ($this->app->environment('production')) {
+        if ($this->app->environment('production') || env('APP_ENV') === 'production' || str_starts_with(config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
     }

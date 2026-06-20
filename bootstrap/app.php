@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         SetTelegramWebhook::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
