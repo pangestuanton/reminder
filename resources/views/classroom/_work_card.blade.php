@@ -8,7 +8,7 @@
 
             {{-- Badges --}}
             <div class="flex flex-wrap items-center gap-2 mb-1">
-                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+                <span class="rounded-full bg-slate-100 dark:bg-slate-700/50 px-2 py-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">
                     {{ $work->work_type === 'ASSIGNMENT' ? 'Tugas' : ($work->work_type === 'QUIZ' ? 'Kuis' : $work->work_type) }}
                 </span>
 
@@ -16,18 +16,18 @@
                     <span class="rounded-full bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">Selesai</span>
                 @elseif ($daysLeft !== null)
                     @if ($daysLeft < 0)
-                        <span class="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600">Terlambat {{ abs($daysLeft) }} hari</span>
+                        <span class="rounded-full bg-red-50 dark:bg-red-900/30 px-2 py-0.5 text-xs font-semibold text-red-600 dark:text-red-400">Terlambat {{ abs($daysLeft) }} hari</span>
                     @elseif ($daysLeft === 0)
-                        <span class="rounded-full bg-orange-50 px-2 py-0.5 text-xs font-semibold text-orange-600">Hari ini!</span>
+                        <span class="rounded-full bg-orange-50 dark:bg-orange-900/30 px-2 py-0.5 text-xs font-semibold text-orange-600 dark:text-orange-400">Hari ini!</span>
                     @elseif ($daysLeft === 1)
-                        <span class="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-600">Besok</span>
+                        <span class="rounded-full bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-semibold text-amber-600 dark:text-amber-400">Besok</span>
                     @elseif ($daysLeft <= 7)
-                        <span class="rounded-full bg-yellow-50 px-2 py-0.5 text-xs font-semibold text-yellow-600">{{ $daysLeft }} hari lagi</span>
+                        <span class="rounded-full bg-yellow-50 dark:bg-yellow-900/30 px-2 py-0.5 text-xs font-semibold text-yellow-600 dark:text-yellow-400">{{ $daysLeft }} hari lagi</span>
                     @else
-                        <span class="rounded-full bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">{{ $daysLeft }} hari lagi</span>
+                        <span class="rounded-full bg-slate-50 dark:bg-slate-700/30 px-2 py-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">{{ $daysLeft }} hari lagi</span>
                     @endif
                 @else
-                    <span class="rounded-full bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-400">Tanpa deadline</span>
+                    <span class="rounded-full bg-slate-50 dark:bg-slate-700/30 px-2 py-0.5 text-xs font-medium text-slate-400 dark:text-slate-500">Tanpa deadline</span>
                 @endif
             </div>
 

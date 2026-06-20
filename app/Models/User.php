@@ -18,6 +18,7 @@ class User extends Authenticatable
         'password',
         'google_id',
         'avatar',
+        'theme_preference',
         'daily_agenda_enabled',
         'daily_agenda_time',
         'daily_agenda_include_overdue',

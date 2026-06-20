@@ -15,6 +15,7 @@ use App\Http\Controllers\JadwalKegiatanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TelegramLinkController;
+use App\Http\Controllers\ThemeController;
 use App\Models\GoogleClassroomCourse;
 use App\Models\GoogleClassroomCourseWork;
 use App\Models\JadwalKegiatan;
@@ -44,6 +45,8 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout');
+
+    Route::post('/theme', ThemeController::class)->name('theme.update');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
