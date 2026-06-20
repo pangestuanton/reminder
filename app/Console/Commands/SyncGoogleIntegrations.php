@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\SyncGoogleClassroomJob;
 use App\Jobs\SyncGoogleCalendarJob;
+use App\Jobs\SyncGoogleClassroomJob;
 use App\Models\User;
 use Illuminate\Console\Command;
 

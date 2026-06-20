@@ -31,7 +31,7 @@ class SyncGoogleClassroomJob implements ShouldQueue
 
     public function uniqueId(): string
     {
-        return 'sync_classroom:' . $this->user->id;
+        return 'sync_classroom:'.$this->user->id;
     }
 
     public function backoff(): array

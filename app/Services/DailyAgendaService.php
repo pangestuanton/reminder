@@ -7,8 +7,6 @@ use App\Models\GoogleCalendarEvent;
 use App\Models\JadwalKegiatan;
 use App\Models\NotificationLog;
 use App\Models\User;
-use App\Notifications\DailyAgendaNotification;
-use Illuminate\Support\Facades\Log;
 
 class DailyAgendaService
 {
@@ -25,9 +23,8 @@ class DailyAgendaService
 
         $tasks = JadwalKegiatan::where('user_id', $user->id)
             ->where(function ($q) {
-                $q->where('deadline_at', '>=', now()->startOfDay())
-                    ->orWhere('waktu_pelaksanaan', '>=', now()->startOfDay())
-                    ->where('waktu_pelaksanaan', '<=', now()->endOfDay());
+                $q->whereBetween('waktu_pelaksanaan', [now()->startOfDay(), now()->endOfDay()])
+                    ->orWhereBetween('deadline_at', [now()->startOfDay(), now()->endOfDay()]);
             })
             ->where('status', '!=', 'dibatalkan')
             ->orderBy('waktu_pelaksanaan')
@@ -36,12 +33,12 @@ class DailyAgendaService
         $collegeClasses = CollegeSchedule::where('user_id', $user->id)
             ->active()
             ->currentSemester()
-            ->forDay($this->getDayName(now()->dayOfWeek))
+            ->forDay($this->getDayName(now()->timezone('Asia/Jakarta')->dayOfWeek))
             ->orderBy('jam_mulai')
             ->get();
 
         $calendarEvents = GoogleCalendarEvent::where('user_id', $user->id)
-            ->forDate(now())
+            ->forDate(now()->timezone('Asia/Jakarta'))
             ->orderBy('start_datetime')
             ->get();
 
@@ -149,7 +146,7 @@ class DailyAgendaService
         $message = implode("\n", $lines);
 
         if (mb_strlen($message) > 4000) {
-            $message = mb_substr($message, 0, 3950) . "\n\n... 📋 agenda terpotong. Cek dashboard untuk detail lengkap.";
+            $message = mb_substr($message, 0, 3950)."\n\n... 📋 agenda terpotong. Cek dashboard untuk detail lengkap.";
         }
 
         return $message;
@@ -175,7 +172,7 @@ class DailyAgendaService
         ];
 
         return [
-            $greetings[array_rand($greetings)] . ' 👋',
+            $greetings[array_rand($greetings)].' 👋',
             "📅 *Agenda {$dayName}, {$date}*",
         ];
     }
@@ -196,9 +193,9 @@ class DailyAgendaService
     protected function buildEmptyDayMessage(): string
     {
         $messages = [
-            "🎉 *Hari ini kosong!* Nikmati waktu luangmu. Tapi jangan lupa cek jadwal besok ya!",
-            "🌿 *Hari bebas!* Manfaatkan untuk istirahat atau mengejar tugas yang tertunda.",
-            "✨ *Tidak ada agenda hari ini.* Ini saat yang tepat untuk rehat sejenak!",
+            '🎉 *Hari ini kosong!* Nikmati waktu luangmu. Tapi jangan lupa cek jadwal besok ya!',
+            '🌿 *Hari bebas!* Manfaatkan untuk istirahat atau mengejar tugas yang tertunda.',
+            '✨ *Tidak ada agenda hari ini.* Ini saat yang tepat untuk rehat sejenak!',
         ];
 
         return $messages[array_rand($messages)];

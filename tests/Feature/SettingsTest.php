@@ -58,4 +58,49 @@ class SettingsTest extends TestCase
         $this->assertEquals('06:00', $user->daily_agenda_time);
         $this->assertEquals('compact', $user->daily_agenda_format);
     }
+
+    public function test_updating_preferences_with_omitted_checkboxes_sets_them_to_false(): void
+    {
+        $user = User::factory()->create();
+        $prefs = UserNotificationPreference::create([
+            'user_id' => $user->id,
+            'telegram_enabled' => true,
+            'reminder_h3_enabled' => true,
+            'reminder_h1_enabled' => true,
+            'reminder_3h_enabled' => true,
+            'reminder_overdue_enabled' => true,
+        ]);
+
+        $this->actingAs($user)->put(route('settings.notifications.update'), [
+            'quiet_hours_start' => '23:00',
+            'quiet_hours_end' => '07:00',
+            'tone' => 'formal',
+            'detail_level' => 'compact',
+            'reminder_max_per_day' => 10,
+        ])->assertRedirect();
+
+        $prefs->refresh();
+        $this->assertFalse($prefs->telegram_enabled);
+        $this->assertFalse($prefs->reminder_h3_enabled);
+        $this->assertFalse($prefs->reminder_h1_enabled);
+        $this->assertFalse($prefs->reminder_3h_enabled);
+        $this->assertFalse($prefs->reminder_overdue_enabled);
+    }
+
+    public function test_updating_agenda_with_omitted_checkboxes_sets_them_to_false(): void
+    {
+        $user = User::factory()->create([
+            'daily_agenda_enabled' => true,
+            'daily_agenda_include_overdue' => true,
+        ]);
+
+        $this->actingAs($user)->put(route('settings.agenda.update'), [
+            'daily_agenda_time' => '06:00',
+            'daily_agenda_format' => 'compact',
+        ])->assertRedirect();
+
+        $user->refresh();
+        $this->assertFalse($user->daily_agenda_enabled);
+        $this->assertFalse($user->daily_agenda_include_overdue);
+    }
 }

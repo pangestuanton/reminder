@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\GoogleAccount;
+use App\Models\CollegeSchedule;
 use App\Models\GoogleCalendarEvent;
 use App\Models\JadwalKegiatan;
 use App\Models\User;
@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 class GoogleCalendarService
 {
     protected Client $httpClient;
+
     protected GoogleTokenService $tokenService;
 
     public function __construct(GoogleTokenService $tokenService)
@@ -42,6 +43,7 @@ class GoogleCalendarService
             foreach ($events as $eventData) {
                 if (isset($eventData['status']) && $eventData['status'] === 'cancelled') {
                     $this->handleCancelledEvent($user, $eventData);
+
                     continue;
                 }
 
@@ -108,7 +110,7 @@ class GoogleCalendarService
                 'https://www.googleapis.com/calendar/v3/calendars/primary/events',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $token,
+                        'Authorization' => 'Bearer '.$token,
                         'Content-Type' => 'application/json',
                     ],
                     'json' => $eventBody,
@@ -134,7 +136,7 @@ class GoogleCalendarService
         }
     }
 
-    public function exportCollegeSchedule(User $user, \App\Models\CollegeSchedule $schedule): ?string
+    public function exportCollegeSchedule(User $user, CollegeSchedule $schedule): ?string
     {
         $account = $user->googleAccount;
         if (! $account || ! $account->isCalendarConnected()) {
@@ -149,16 +151,27 @@ class GoogleCalendarService
         try {
             $rrule = $this->buildRecurrenceRule($schedule);
 
+            $englishDay = match (strtolower($schedule->hari)) {
+                'senin' => 'monday',
+                'selasa' => 'tuesday',
+                'rabu' => 'wednesday',
+                'kamis' => 'thursday',
+                'jumat' => 'friday',
+                'sabtu' => 'saturday',
+                'minggu' => 'sunday',
+                default => 'monday',
+            };
+
             $eventBody = [
                 'summary' => $schedule->mata_kuliah,
-                'description' => trim(($schedule->dosen ? "Dosen: {$schedule->dosen}\n" : '') . ($schedule->catatan ?? '')),
+                'description' => trim(($schedule->dosen ? "Dosen: {$schedule->dosen}\n" : '').($schedule->catatan ?? '')),
                 'location' => $schedule->lokasi,
                 'start' => [
-                    'dateTime' => now()->modify('next ' . $schedule->hari)->format('Y-m-d') . 'T' . $schedule->jam_mulai . ':00',
+                    'dateTime' => now()->modify('next '.$englishDay)->format('Y-m-d').'T'.$schedule->jam_mulai.':00',
                     'timeZone' => 'Asia/Jakarta',
                 ],
                 'end' => [
-                    'dateTime' => now()->modify('next ' . $schedule->hari)->format('Y-m-d') . 'T' . $schedule->jam_selesai . ':00',
+                    'dateTime' => now()->modify('next '.$englishDay)->format('Y-m-d').'T'.$schedule->jam_selesai.':00',
                     'timeZone' => 'Asia/Jakarta',
                 ],
                 'recurrence' => [$rrule],
@@ -169,7 +182,7 @@ class GoogleCalendarService
                 'https://www.googleapis.com/calendar/v3/calendars/primary/events',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $token,
+                        'Authorization' => 'Bearer '.$token,
                         'Content-Type' => 'application/json',
                     ],
                     'json' => $eventBody,
@@ -210,7 +223,7 @@ class GoogleCalendarService
                 "https://www.googleapis.com/calendar/v3/calendars/primary/events/{$jadwal->calendar_event_id}",
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $token,
+                        'Authorization' => 'Bearer '.$token,
                         'Content-Type' => 'application/json',
                     ],
                     'json' => $eventBody,
@@ -235,13 +248,13 @@ class GoogleCalendarService
     {
         $event = [
             'summary' => $jadwal->judul,
-            'description' => trim(($jadwal->course_name ? "Mata Kuliah: {$jadwal->course_name}\n" : '') . ($jadwal->deskripsi ?? '')),
+            'description' => trim(($jadwal->course_name ? "Mata Kuliah: {$jadwal->course_name}\n" : '').($jadwal->deskripsi ?? '')),
             'location' => $jadwal->lokasi_atau_link,
         ];
 
         if ($jadwal->is_all_day) {
             $event['start'] = ['date' => $jadwal->waktu_pelaksanaan->toDateString()];
-            $event['end'] = ['date' => $jadwal->waktu_pelaksanaan->addDay()->toDateString()];
+            $event['end'] = ['date' => $jadwal->waktu_pelaksanaan->copy()->addDay()->toDateString()];
         } else {
             $event['start'] = [
                 'dateTime' => $jadwal->waktu_pelaksanaan->toIso8601String(),
@@ -256,7 +269,7 @@ class GoogleCalendarService
         return $event;
     }
 
-    protected function buildRecurrenceRule(\App\Models\CollegeSchedule $schedule): string
+    protected function buildRecurrenceRule(CollegeSchedule $schedule): string
     {
         $days = match (strtolower($schedule->hari)) {
             'senin' => 'MO',
@@ -272,7 +285,7 @@ class GoogleCalendarService
         $rule = "RRULE:FREQ=WEEKLY;BYDAY={$days}";
 
         if ($schedule->semester_akhir) {
-            $rule .= ';UNTIL=' . $schedule->semester_akhir->format('Ymd') . 'T235959Z';
+            $rule .= ';UNTIL='.$schedule->semester_akhir->format('Ymd').'T235959Z';
         }
 
         return $rule;
@@ -319,7 +332,7 @@ class GoogleCalendarService
             $response = $this->httpClient->get(
                 "https://www.googleapis.com/calendar/v3/calendars/{$calendarId}/events",
                 [
-                    'headers' => ['Authorization' => 'Bearer ' . $token],
+                    'headers' => ['Authorization' => 'Bearer '.$token],
                     'query' => $params,
                 ]
             );

@@ -1,9 +1,5 @@
 <?php
 
-use App\Console\Commands\SendDailyAgenda;
-use App\Console\Commands\SendScheduleReminders;
-use App\Console\Commands\SyncGoogleIntegrations;
-use App\Console\Commands\SetTelegramWebhook;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schedule;
 

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CollegeSchedule;
+use App\Models\GoogleCalendarEvent;
+use App\Models\NotificationLog;
 use App\Services\AnalyticsService;
 use App\Services\DashboardStatsService;
 use Illuminate\View\View;
@@ -18,21 +21,21 @@ class DashboardController extends Controller
         $user = auth()->user();
         $stats = $this->dashboardStatsService->get($user);
 
-        $todayClasses = \App\Models\CollegeSchedule::where('user_id', $user->id)
+        $todayClasses = CollegeSchedule::where('user_id', $user->id)
             ->active()
             ->currentSemester()
             ->forDay(now()->translatedFormat('l'))
             ->orderBy('jam_mulai')
             ->get();
 
-        $todayEvents = \App\Models\GoogleCalendarEvent::where('user_id', $user->id)
+        $todayEvents = GoogleCalendarEvent::where('user_id', $user->id)
             ->forDate(now())
             ->orderBy('start_datetime')
             ->get();
 
         $analytics = $this->analyticsService->getStats($user);
 
-        $recentNotifications = \App\Models\NotificationLog::where('user_id', $user->id)
+        $recentNotifications = NotificationLog::where('user_id', $user->id)
             ->orderByDesc('sent_at')
             ->limit(5)
             ->get();

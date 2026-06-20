@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CollegeSchedule extends Model
 {
@@ -30,14 +31,26 @@ class CollegeSchedule extends Model
     ];
 
     protected $casts = [
-        'jam_mulai' => 'datetime:H:i',
-        'jam_selesai' => 'datetime:H:i',
         'semester_mulai' => 'date',
         'semester_akhir' => 'date',
         'is_active' => 'boolean',
         'synced_to_calendar' => 'boolean',
         'reminder_minutes' => 'integer',
     ];
+
+    protected function jamMulai(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('H:i') : null,
+        );
+    }
+
+    protected function jamSelesai(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('H:i') : null,
+        );
+    }
 
     public function user(): BelongsTo
     {

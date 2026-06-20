@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SyncGoogleClassroomJob;
-use App\Jobs\SyncGoogleCalendarJob;
-use App\Models\GoogleAccount;
 use App\Services\GoogleTokenService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
-use Laravel\Socialite\Two\AbstractProvider;
-use Illuminate\Contracts\View\View;
 
 class IntegrationsController extends Controller
 {
@@ -60,15 +54,15 @@ class IntegrationsController extends Controller
         $scopes = array_values(array_unique(array_merge($existingScopes, $serviceScopes)));
 
         session([
-            'google_integration_service'        => $service,
-            'google_integration_scopes'         => $scopes,
+            'google_integration_service' => $service,
+            'google_integration_scopes' => $scopes,
         ]);
 
         return Socialite::driver('google')
             ->scopes($scopes)
             ->with([
                 'access_type' => 'offline',
-                'prompt'      => 'consent',
+                'prompt' => 'consent',
             ])
             ->redirectUrl(route('google.callback'))
             ->redirect();

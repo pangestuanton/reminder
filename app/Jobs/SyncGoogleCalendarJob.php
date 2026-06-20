@@ -31,7 +31,7 @@ class SyncGoogleCalendarJob implements ShouldQueue
 
     public function uniqueId(): string
     {
-        return 'sync_calendar:' . $this->user->id;
+        return 'sync_calendar:'.$this->user->id;
     }
 
     public function backoff(): array

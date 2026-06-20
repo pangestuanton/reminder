@@ -56,12 +56,14 @@ class GoogleCalendarEvent extends Model
     public function scopeForDate($query, $date)
     {
         return $query->where(function ($q) use ($date) {
-            $q->where('start_datetime', '>=', $date->copy()->startOfDay())
-                ->where('start_datetime', '<=', $date->copy()->endOfDay());
-        })->orWhere(function ($q) use ($date) {
-            $q->where('is_all_day', true)
-                ->where('start_date', '<=', $date->toDateString())
-                ->where('end_date', '>=', $date->toDateString());
+            $q->where(function ($sub) use ($date) {
+                $sub->where('start_datetime', '>=', $date->copy()->startOfDay())
+                    ->where('start_datetime', '<=', $date->copy()->endOfDay());
+            })->orWhere(function ($sub) use ($date) {
+                $sub->where('is_all_day', true)
+                    ->where('start_date', '<=', $date->toDateString())
+                    ->where('end_date', '>=', $date->toDateString());
+            });
         });
     }
 }

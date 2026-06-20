@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\GoogleAccount;
 use App\Models\GoogleClassroomCourse;
 use App\Models\GoogleClassroomCourseWork;
 use App\Models\GoogleClassroomSubmission;
@@ -15,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 class GoogleClassroomService
 {
     protected Client $httpClient;
+
     protected GoogleTokenService $tokenService;
 
     public function __construct(GoogleTokenService $tokenService)
@@ -89,7 +89,7 @@ class GoogleClassroomService
         $synced = 0;
 
         Log::info('Starting courseWork sync', [
-            'user_id'      => $user->id,
+            'user_id' => $user->id,
             'course_count' => $courses->count(),
         ]);
 
@@ -99,18 +99,19 @@ class GoogleClassroomService
                 $works = $this->fetchCourseWork($token, $course->external_id);
             } catch (\Throwable $e) {
                 Log::warning('CourseWork fetch failed for course', [
-                    'user_id'           => $user->id,
-                    'course'            => $course->name,
-                    'course_external_id'=> $course->external_id,
-                    'error'             => $e->getMessage(),
+                    'user_id' => $user->id,
+                    'course' => $course->name,
+                    'course_external_id' => $course->external_id,
+                    'error' => $e->getMessage(),
                 ]);
+
                 continue;
             }
 
             Log::info('CourseWork fetched for course', [
-                'user_id'    => $user->id,
-                'course'     => $course->name,
-                'course_id'  => $course->external_id,
+                'user_id' => $user->id,
+                'course' => $course->name,
+                'course_id' => $course->external_id,
                 'work_count' => count($works),
             ]);
 
@@ -121,16 +122,16 @@ class GoogleClassroomService
                         ['user_id' => $user->id, 'external_id' => $workData['id']],
                         [
                             'google_classroom_course_id' => $course->id,
-                            'title'         => $workData['title'] ?? '',
-                            'description'   => $workData['description'] ?? null,
-                            'due_date'      => $this->parseDueDate($workData['dueDate'] ?? null),
+                            'title' => $workData['title'] ?? '',
+                            'description' => $workData['description'] ?? null,
+                            'due_date' => $this->parseDueDate($workData['dueDate'] ?? null),
                             'due_time_only' => $this->parseDueTime($workData['dueTime'] ?? null),
-                            'max_points'    => $workData['maxPoints'] ?? null,
-                            'work_type'     => $workData['workType'] ?? 'ASSIGNMENT',
-                            'status'        => $workData['state'] ?? 'PUBLISHED',
-                            'alternate_link'=> $workData['alternateLink'] ?? null,
-                            'materials'     => $this->extractMaterials($workData['materials'] ?? []),
-                            'synced_at'     => now(),
+                            'max_points' => $workData['maxPoints'] ?? null,
+                            'work_type' => $workData['workType'] ?? 'ASSIGNMENT',
+                            'status' => $workData['state'] ?? 'PUBLISHED',
+                            'alternate_link' => $workData['alternateLink'] ?? null,
+                            'materials' => $this->extractMaterials($workData['materials'] ?? []),
+                            'synced_at' => now(),
                         ]
                     );
 
@@ -139,18 +140,18 @@ class GoogleClassroomService
                     $synced++;
                 } catch (\Throwable $e) {
                     Log::warning('CourseWork item sync failed', [
-                        'user_id'    => $user->id,
-                        'course'     => $course->name,
+                        'user_id' => $user->id,
+                        'course' => $course->name,
                         'work_title' => $workData['title'] ?? '?',
-                        'error'      => $e->getMessage(),
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
         }
 
         Log::info('CourseWork sync complete', [
-            'user_id'     => $user->id,
-            'total_synced'=> $synced,
+            'user_id' => $user->id,
+            'total_synced' => $synced,
         ]);
 
         return ['course_works' => $synced];
@@ -161,7 +162,7 @@ class GoogleClassroomService
         try {
             $response = $this->httpClient->get(
                 "https://classroom.googleapis.com/v1/courses/{$courseWork->course->external_id}/courseWork/{$courseWork->external_id}/studentSubmissions",
-                ['headers' => ['Authorization' => 'Bearer ' . $this->getAccessTokenForUser($user)]]
+                ['headers' => ['Authorization' => 'Bearer '.$this->getAccessTokenForUser($user)]]
             );
 
             $data = json_decode($response->getBody()->getContents(), true);
@@ -332,7 +333,7 @@ class GoogleClassroomService
             $response = $this->httpClient->get(
                 'https://classroom.googleapis.com/v1/courses',
                 [
-                    'headers' => ['Authorization' => 'Bearer ' . $token],
+                    'headers' => ['Authorization' => 'Bearer '.$token],
                     'query' => $params,
                 ]
             );
@@ -359,7 +360,7 @@ class GoogleClassroomService
             $response = $this->httpClient->get(
                 "https://classroom.googleapis.com/v1/courses/{$courseId}/courseWork",
                 [
-                    'headers' => ['Authorization' => 'Bearer ' . $token],
+                    'headers' => ['Authorization' => 'Bearer '.$token],
                     'query' => $params,
                 ]
             );

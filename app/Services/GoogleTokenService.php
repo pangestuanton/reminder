@@ -81,11 +81,11 @@ class GoogleTokenService
         $mergedScopes = array_values(array_unique(array_merge($existingScopes, $scopes)));
 
         $updateData = [
-            'google_account_email'   => $email ?? $user->email,
+            'google_account_email' => $email ?? $user->email,
             'access_token_encrypted' => Crypt::encryptString($accessToken),
-            'token_expires_at'       => now()->addSeconds($expiresIn),
-            'scopes'                 => $mergedScopes,
-            'disconnected_at'        => null,
+            'token_expires_at' => now()->addSeconds($expiresIn),
+            'scopes' => $mergedScopes,
+            'disconnected_at' => null,
         ];
 
         // Only update refresh_token if we got a new one from Google

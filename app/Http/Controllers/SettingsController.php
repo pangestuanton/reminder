@@ -44,15 +44,15 @@ class SettingsController extends Controller
         );
 
         $prefs->update([
-            'telegram_enabled' => $data['telegram_enabled'] ?? true,
+            'telegram_enabled' => $request->boolean('telegram_enabled'),
             'quiet_hours_start' => $data['quiet_hours_start'],
             'quiet_hours_end' => $data['quiet_hours_end'],
             'tone' => $data['tone'],
             'detail_level' => $data['detail_level'],
-            'reminder_h3_enabled' => $data['reminder_h3_enabled'] ?? true,
-            'reminder_h1_enabled' => $data['reminder_h1_enabled'] ?? true,
-            'reminder_3h_enabled' => $data['reminder_3h_enabled'] ?? true,
-            'reminder_overdue_enabled' => $data['reminder_overdue_enabled'] ?? true,
+            'reminder_h3_enabled' => $request->boolean('reminder_h3_enabled'),
+            'reminder_h1_enabled' => $request->boolean('reminder_h1_enabled'),
+            'reminder_3h_enabled' => $request->boolean('reminder_3h_enabled'),
+            'reminder_overdue_enabled' => $request->boolean('reminder_overdue_enabled'),
             'reminder_max_per_day' => $data['reminder_max_per_day'],
         ]);
 
@@ -69,9 +69,9 @@ class SettingsController extends Controller
         ]);
 
         $request->user()->update([
-            'daily_agenda_enabled' => $data['daily_agenda_enabled'] ?? true,
+            'daily_agenda_enabled' => $request->boolean('daily_agenda_enabled'),
             'daily_agenda_time' => $data['daily_agenda_time'],
-            'daily_agenda_include_overdue' => $data['daily_agenda_include_overdue'] ?? true,
+            'daily_agenda_include_overdue' => $request->boolean('daily_agenda_include_overdue'),
             'daily_agenda_format' => $data['daily_agenda_format'],
         ]);
 

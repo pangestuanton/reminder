@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SyncGoogleCalendarJob;
+use App\Jobs\SyncGoogleClassroomJob;
 use App\Models\User;
+use App\Services\GoogleTokenService;
 use GuzzleHttp\Client;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -11,10 +14,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
-
-use App\Services\GoogleTokenService;
-use App\Jobs\SyncGoogleClassroomJob;
-use App\Jobs\SyncGoogleCalendarJob;
 
 class GoogleController extends Controller
 {

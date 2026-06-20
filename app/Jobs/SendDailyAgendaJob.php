@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\User;
+use App\Notifications\DailyAgendaNotification;
 use App\Services\DailyAgendaService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -60,7 +61,7 @@ class SendDailyAgendaJob implements ShouldQueue
                 ->options(['parse_mode' => 'Markdown'])
                 ->button('Dashboard', route('dashboard'));
 
-            $this->user->notifyNow(new \App\Notifications\DailyAgendaNotification($message));
+            $this->user->notifyNow(new DailyAgendaNotification($message));
 
             $agendaService->logSent($this->user);
 

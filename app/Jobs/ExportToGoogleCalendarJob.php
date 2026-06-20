@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\CollegeSchedule;
+use App\Models\JadwalKegiatan;
 use App\Models\User;
 use App\Services\GoogleCalendarService;
 use Illuminate\Bus\Queueable;
@@ -49,7 +50,7 @@ class ExportToGoogleCalendarJob implements ShouldQueue
         }
 
         if ($this->exportableType === 'jadwal') {
-            $jadwal = \App\Models\JadwalKegiatan::where('user_id', $this->user->id)
+            $jadwal = JadwalKegiatan::where('user_id', $this->user->id)
                 ->where('id', $this->exportableId)
                 ->first();
 

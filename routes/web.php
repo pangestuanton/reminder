@@ -14,7 +14,13 @@ use App\Http\Controllers\JadwalKegiatanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TelegramLinkController;
+use App\Models\GoogleClassroomCourse;
+use App\Models\GoogleClassroomCourseWork;
 use App\Models\JadwalKegiatan;
+use App\Services\GoogleClassroomService;
+use App\Services\GoogleTokenService;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -105,15 +111,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/settings/agenda', [SettingsController::class, 'updateAgenda'])->name('settings.agenda.update');
 
     // Temporary debug route — remove after investigation
-    Route::get('/debug/classroom', function (\App\Services\GoogleTokenService $tokenService) {
+    Route::get('/debug/classroom', function (GoogleTokenService $tokenService) {
         $user = auth()->user();
         $account = $user->googleAccount;
         $output = [];
 
         $output['user'] = [
-            'id'        => $user->id,
-            'name'      => $user->name,
-            'email'     => $user->email,
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
             'google_id' => $user->google_id,
         ];
 
@@ -122,39 +128,39 @@ Route::middleware('auth')->group(function () {
             $tokenError = null;
             try {
                 $token = $tokenService->getAccessToken($account);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $tokenError = $e->getMessage();
             }
 
             $output['google_account'] = [
-                'id'                    => $account->id,
-                'email'                 => $account->google_account_email,
-                'classroom_connected_at'=> (string) $account->classroom_connected_at,
+                'id' => $account->id,
+                'email' => $account->google_account_email,
+                'classroom_connected_at' => (string) $account->classroom_connected_at,
                 'calendar_connected_at' => (string) $account->calendar_connected_at,
-                'disconnected_at'       => (string) $account->disconnected_at,
-                'token_expires_at'      => (string) $account->token_expires_at,
-                'token_is_expired'      => $account->isTokenExpired(),
-                'has_access_token'      => ! empty($account->access_token_encrypted),
-                'has_refresh_token'     => ! empty($account->refresh_token_encrypted),
-                'isClassroomConnected'  => $account->isClassroomConnected(),
-                'isCalendarConnected'   => $account->isCalendarConnected(),
-                'access_token_result'   => $token ? 'OK ('.strlen($token).' chars)' : 'FAILED',
-                'token_error'           => $tokenError,
-                'scopes'                => $account->scopes,
+                'disconnected_at' => (string) $account->disconnected_at,
+                'token_expires_at' => (string) $account->token_expires_at,
+                'token_is_expired' => $account->isTokenExpired(),
+                'has_access_token' => ! empty($account->access_token_encrypted),
+                'has_refresh_token' => ! empty($account->refresh_token_encrypted),
+                'isClassroomConnected' => $account->isClassroomConnected(),
+                'isCalendarConnected' => $account->isCalendarConnected(),
+                'access_token_result' => $token ? 'OK ('.strlen($token).' chars)' : 'FAILED',
+                'token_error' => $tokenError,
+                'scopes' => $account->scopes,
             ];
 
             // Try a live Classroom API call
             if ($token) {
                 try {
-                    $http = new \GuzzleHttp\Client(['verify' => false, 'timeout' => 10]);
+                    $http = new Client(['verify' => false, 'timeout' => 10]);
                     $resp = $http->get('https://classroom.googleapis.com/v1/courses', [
-                        'headers' => ['Authorization' => 'Bearer ' . $token],
-                        'query'   => ['pageSize' => 5],
+                        'headers' => ['Authorization' => 'Bearer '.$token],
+                        'query' => ['pageSize' => 5],
                     ]);
                     $data = json_decode($resp->getBody()->getContents(), true);
                     $output['live_api_courses'] = $data['courses'] ?? [];
                     $output['live_api_error'] = null;
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $output['live_api_courses'] = [];
                     $output['live_api_error'] = $e->getMessage();
                 }
@@ -163,16 +169,16 @@ Route::middleware('auth')->group(function () {
             $output['google_account'] = null;
         }
 
-        $output['db_courses'] = \App\Models\GoogleClassroomCourse::ownedBy($user)->get()->toArray();
-        $output['db_course_works_count'] = \App\Models\GoogleClassroomCourseWork::ownedBy($user)->count();
-        $output['db_course_works'] = \App\Models\GoogleClassroomCourseWork::ownedBy($user)->orderBy('due_date')->limit(20)->get()->toArray();
-        $output['pending_jobs'] = \Illuminate\Support\Facades\DB::table('jobs')->count();
-        $output['failed_jobs'] = \Illuminate\Support\Facades\DB::table('failed_jobs')
+        $output['db_courses'] = GoogleClassroomCourse::ownedBy($user)->get()->toArray();
+        $output['db_course_works_count'] = GoogleClassroomCourseWork::ownedBy($user)->count();
+        $output['db_course_works'] = GoogleClassroomCourseWork::ownedBy($user)->orderBy('due_date')->limit(20)->get()->toArray();
+        $output['pending_jobs'] = DB::table('jobs')->count();
+        $output['failed_jobs'] = DB::table('failed_jobs')
             ->orderByDesc('id')->limit(5)
             ->get()
-            ->map(fn($j) => [
-                'queue'     => $j->queue,
-                'job'       => json_decode($j->payload, true)['displayName'] ?? '?',
+            ->map(fn ($j) => [
+                'queue' => $j->queue,
+                'job' => json_decode($j->payload, true)['displayName'] ?? '?',
                 'exception' => substr($j->exception, 0, 500),
             ])->toArray();
 
@@ -180,12 +186,13 @@ Route::middleware('auth')->group(function () {
     })->name('debug.classroom');
 
     // Force-sync classroom synchronously (no queue) — for Railway debugging
-    Route::get('/debug/classroom/sync', function (\App\Services\GoogleClassroomService $classroomService, \App\Services\GoogleTokenService $tokenService) {
+    Route::get('/debug/classroom/sync', function (GoogleClassroomService $classroomService, GoogleTokenService $tokenService) {
         $user = auth()->user();
         $output = ['user_id' => $user->id, 'steps' => []];
 
         if (! $user->hasClassroomAccess()) {
             $output['error'] = 'Classroom not connected. classroom_connected_at is null or disconnected.';
+
             return response()->json($output, 200, [], JSON_PRETTY_PRINT);
         }
 
@@ -195,22 +202,23 @@ Route::middleware('auth')->group(function () {
 
         if (isset($courseResult['error'])) {
             $output['error'] = $courseResult['error'];
+
             return response()->json($output, 200, [], JSON_PRETTY_PRINT);
         }
 
         // Step 2: probe each course individually for courseWork
         $token = $tokenService->getAccessToken($user->googleAccount);
-        $http = new \GuzzleHttp\Client(['verify' => false, 'timeout' => 10]);
+        $http = new Client(['verify' => false, 'timeout' => 10]);
         $perCourse = [];
-        foreach (\App\Models\GoogleClassroomCourse::ownedBy($user)->active()->get() as $course) {
+        foreach (GoogleClassroomCourse::ownedBy($user)->active()->get() as $course) {
             try {
                 $resp = $http->get("https://classroom.googleapis.com/v1/courses/{$course->external_id}/courseWork", [
-                    'headers' => ['Authorization' => 'Bearer ' . $token],
-                    'query'   => ['pageSize' => 10],
+                    'headers' => ['Authorization' => 'Bearer '.$token],
+                    'query' => ['pageSize' => 10],
                 ]);
                 $data = json_decode($resp->getBody()->getContents(), true);
                 $perCourse[$course->name] = ['count' => count($data['courseWork'] ?? []), 'error' => null];
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $perCourse[$course->name] = ['count' => 0, 'error' => $e->getMessage()];
             }
         }
@@ -220,11 +228,11 @@ Route::middleware('auth')->group(function () {
         $workResult = $classroomService->syncCourseWork($user);
         $output['steps'][] = ['sync_course_works' => $workResult];
 
-        $output['db_courses_count']      = \App\Models\GoogleClassroomCourse::ownedBy($user)->count();
-        $output['db_course_works_count'] = \App\Models\GoogleClassroomCourseWork::ownedBy($user)->count();
-        $output['db_course_works']       = \App\Models\GoogleClassroomCourseWork::ownedBy($user)
+        $output['db_courses_count'] = GoogleClassroomCourse::ownedBy($user)->count();
+        $output['db_course_works_count'] = GoogleClassroomCourseWork::ownedBy($user)->count();
+        $output['db_course_works'] = GoogleClassroomCourseWork::ownedBy($user)
             ->orderBy('due_date')->get()
-            ->map(fn($w) => ['id' => $w->id, 'title' => $w->title, 'due_date' => $w->due_date, 'status' => $w->status])
+            ->map(fn ($w) => ['id' => $w->id, 'title' => $w->title, 'due_date' => $w->due_date, 'status' => $w->status])
             ->toArray();
         $output['message'] = 'Sync complete. Refresh /classroom to see your tasks.';
 
