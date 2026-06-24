@@ -52,7 +52,7 @@
     </div>
 
     <!-- Header / Navbar -->
-    <header class="relative z-10 border-b border-slate-200/60 dark:border-slate-800/80 backdrop-blur-md bg-white/70 dark:bg-slate-950/70 sticky top-0 transition-colors duration-200">
+    <header :class="mobileMenuOpen ? 'bg-white dark:bg-slate-950 z-50 shadow-md' : 'bg-white/70 dark:bg-slate-950/70 backdrop-blur-md z-40'" class="border-b border-slate-200/60 dark:border-slate-800/80 sticky top-0 transition-all duration-200">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex h-16 items-center justify-between">
                 <!-- Logo -->
@@ -66,14 +66,14 @@
                 </div>
 
                 <!-- Navigation Links (Desktop) -->
-                <nav class="hidden md:flex items-center gap-8">
+                <nav class="hidden lg:flex items-center gap-8">
                     <a href="#tujuan" class="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-pink-600 dark:hover:text-pink-400 transition-colors">Tujuan</a>
                     <a href="#manfaat" class="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-pink-600 dark:hover:text-pink-400 transition-colors">Manfaat</a>
                     <a href="#fungsi" class="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-pink-600 dark:hover:text-pink-400 transition-colors">Fitur</a>
                 </nav>
 
                 <!-- Actions and Theme Switcher (Desktop) -->
-                <div class="hidden md:flex items-center gap-4">
+                <div class="hidden lg:flex items-center gap-4">
                     <!-- Theme Toggle -->
                     <div class="flex items-center gap-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 p-1 border border-slate-200/50 dark:border-slate-700/40">
                         <button @click="setTheme('light')" 
@@ -114,7 +114,7 @@
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <div class="flex items-center md:hidden gap-3">
+                <div class="flex items-center lg:hidden gap-3">
                     <!-- Theme Toggle for Mobile -->
                     <button @click="setTheme(themeMode === 'light' ? 'dark' : (themeMode === 'dark' ? 'system' : 'light'))" 
                             class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
@@ -155,7 +155,7 @@
              x-transition:leave="transition ease-in duration-100" 
              x-transition:leave-start="opacity-100 scale-100" 
              x-transition:leave-end="opacity-0 scale-95" 
-             class="md:hidden absolute top-16 inset-x-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 space-y-3 shadow-lg z-20 transition-colors duration-200">
+             class="lg:hidden absolute top-16 inset-x-0 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-4 space-y-3 shadow-xl z-50 transition-colors duration-200">
             <a href="#tujuan" @click="mobileMenuOpen = false" class="block rounded-xl px-3 py-2 text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-pink-600 dark:hover:text-pink-400">Tujuan</a>
             <a href="#manfaat" @click="mobileMenuOpen = false" class="block rounded-xl px-3 py-2 text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-pink-600 dark:hover:text-pink-400">Manfaat</a>
             <a href="#fungsi" @click="mobileMenuOpen = false" class="block rounded-xl px-3 py-2 text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-pink-600 dark:hover:text-pink-400">Fitur</a>
@@ -223,7 +223,7 @@
 
             <!-- App mockup element (styled CSS only) -->
             <div class="mt-16 sm:mt-20 relative max-w-5xl mx-auto rounded-3xl border border-slate-200 dark:border-slate-800 p-2 bg-slate-200/50 dark:bg-slate-900/40 shadow-2xl backdrop-blur-sm animate-fade-in-up">
-                <div class="overflow-hidden rounded-2xl bg-white dark:bg-slate-900 aspect-[16/9] flex flex-col text-left">
+                <div class="overflow-hidden rounded-2xl bg-white dark:bg-slate-900 aspect-auto min-h-[480px] md:aspect-[16/9] md:min-h-0 flex flex-col text-left">
                     <!-- Browser header simulation -->
                     <div class="h-10 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 flex items-center gap-2">
                         <div class="flex gap-1.5">
@@ -239,7 +239,7 @@
                     <div class="p-4 sm:p-6 flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 overflow-y-auto bg-gradient-to-br from-pink-50/10 to-slate-50/30 dark:from-slate-950/20 dark:to-slate-950/40">
                         <div class="md:col-span-2 space-y-4">
                             <!-- Cards row -->
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div class="p-4 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800">
                                     <div class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Tugas Google Classroom</div>
                                     <div class="text-xl font-bold mt-1 text-slate-800 dark:text-white">8 Aktif</div>
@@ -258,19 +258,19 @@
                                     <span class="text-[10px] text-pink-500 font-bold">Rabu</span>
                                 </div>
                                 <div class="space-y-2">
-                                    <div class="p-2.5 rounded-xl bg-pink-50/50 dark:bg-pink-950/20 border-l-4 border-pink-500 flex justify-between items-center text-xs">
+                                    <div class="p-2.5 rounded-xl bg-pink-50/50 dark:bg-pink-950/20 border-l-4 border-pink-500 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-xs">
                                         <div>
                                             <div class="font-bold text-slate-800 dark:text-white">Pemrograman Web Lanjut</div>
                                             <div class="text-[10px] text-slate-400 dark:text-slate-500">Ruang Lab 3 • 08:00 - 10:30</div>
                                         </div>
-                                        <span class="px-2 py-0.5 rounded-full bg-pink-100 dark:bg-pink-900/50 text-[10px] text-pink-600 dark:text-pink-400 font-semibold">Sedang Berlangsung</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-pink-100 dark:bg-pink-900/50 text-[10px] text-pink-600 dark:text-pink-400 font-semibold inline-block shrink-0">Sedang Berlangsung</span>
                                     </div>
-                                    <div class="p-2.5 rounded-xl bg-slate-50/50 dark:bg-slate-800/40 border-l-4 border-slate-300 dark:border-slate-700 flex justify-between items-center text-xs">
+                                    <div class="p-2.5 rounded-xl bg-slate-50/50 dark:bg-slate-800/40 border-l-4 border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-xs">
                                         <div>
                                             <div class="font-bold text-slate-700 dark:text-slate-300">Kecerdasan Buatan (AI)</div>
                                             <div class="text-[10px] text-slate-400 dark:text-slate-500">Gedung D.201 • 13:00 - 15:30</div>
                                         </div>
-                                        <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Nanti Siang</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-[10px] text-slate-500 dark:text-slate-400 font-semibold inline-block shrink-0">Nanti Siang</span>
                                     </div>
                                 </div>
                             </div>
