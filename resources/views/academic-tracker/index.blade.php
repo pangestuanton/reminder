@@ -375,10 +375,10 @@
                  },
                  get letterGrade() {
                      let score = this.finalScore;
-                     if (score >= 80) return 'A';
-                     if (score >= 73) return 'AB';
+                     if (score >= 75) return 'A';
+                     if (score >= 70) return 'AB';
                      if (score >= 65) return 'B';
-                     if (score >= 58) return 'BC';
+                     if (score >= 60) return 'BC';
                      if (score >= 50) return 'C';
                      if (score >= 40) return 'D';
                      return 'E';
@@ -584,27 +584,27 @@
                                  </thead>
                                  <tbody class="divide-y divide-slate-50 dark:divide-slate-700/40 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-850">
                                      <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
-                                         <td class="px-3 py-1.5">&ge; 80</td>
+                                         <td class="px-3 py-1.5">&ge; 75</td>
                                          <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">A</td>
                                          <td class="px-3 py-1.5 text-right font-semibold">4.0</td>
                                      </tr>
                                      <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
-                                         <td class="px-3 py-1.5">73 - 79.99</td>
+                                         <td class="px-3 py-1.5">70 - 74.99</td>
                                          <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">AB</td>
                                          <td class="px-3 py-1.5 text-right font-semibold">3.5</td>
                                      </tr>
                                      <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
-                                         <td class="px-3 py-1.5">65 - 72.99</td>
+                                         <td class="px-3 py-1.5">65 - 69.99</td>
                                          <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">B</td>
                                          <td class="px-3 py-1.5 text-right font-semibold">3.0</td>
                                      </tr>
                                      <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
-                                         <td class="px-3 py-1.5">58 - 64.99</td>
+                                         <td class="px-3 py-1.5">60 - 64.99</td>
                                          <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">BC</td>
                                          <td class="px-3 py-1.5 text-right font-semibold">2.5</td>
                                      </tr>
                                      <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
-                                         <td class="px-3 py-1.5">50 - 57.99</td>
+                                         <td class="px-3 py-1.5">50 - 59.99</td>
                                          <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">C</td>
                                          <td class="px-3 py-1.5 text-right font-semibold">2.0</td>
                                      </tr>
