@@ -1,7 +1,11 @@
 <x-layouts.app title="Akademik & Analitik - Aviona Sync">
     <div x-data="{ 
         activeTab: '{{ request('tab', 'nilai') }}', 
-        showAddModal: false 
+        showAddModal: false,
+        modalSemester: 1,
+        modalMataKuliah: '',
+        modalSks: 3,
+        modalNilai: 'A'
     }" class="space-y-6">
         
         {{-- Header & Tab Section --}}
@@ -17,6 +21,11 @@
                     class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-semibold transition-all focus:outline-none">
                     Analitik Progres
                 </button>
+                <button @click="activeTab = 'kalkulator'; window.history.replaceState(null, null, '?tab=kalkulator')" 
+                    :class="activeTab === 'kalkulator' ? 'border-pink-500 text-pink-600 font-bold dark:text-pink-400' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'"
+                    class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-semibold transition-all focus:outline-none">
+                    Kalkulator Nilai Akhir
+                </button>
             </nav>
         </div>
 
@@ -28,7 +37,7 @@
                     <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Tracker Akademik</h1>
                     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Kelola nilai perkuliahan, hitung IPS & IPK secara otomatis dengan skala standar A=4.0 s/d E=0.0.</p>
                 </div>
-                <x-button @click="showAddModal = true" class="bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600 focus:ring-pink-100">
+                <x-button @click="modalSemester = 1; modalMataKuliah = ''; modalSks = 3; modalNilai = 'A'; showAddModal = true" class="bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600 focus:ring-pink-100">
                     Tambah Nilai
                 </x-button>
             </div>
@@ -201,7 +210,7 @@
                     </x-card>
                 @empty
                     <x-empty-state title="Belum ada data akademik" description="Mulailah dengan menambahkan mata kuliah dan nilaimu per semester.">
-                        <x-button @click="showAddModal = true" class="bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600">Tambah Nilai</x-button>
+                        <x-button @click="modalSemester = 1; modalMataKuliah = ''; modalSks = 3; modalNilai = 'A'; showAddModal = true" class="bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600">Tambah Nilai</x-button>
                     </x-empty-state>
                 @endforelse
             </div>
@@ -325,6 +334,298 @@
             </div>
         </div>
 
+        {{-- TAB 3: Kalkulator Nilai Akhir --}}
+        <div x-show="activeTab === 'kalkulator'" x-transition class="space-y-6" style="display: none;"
+             x-data="{
+                 mataKuliah: '',
+                 semester: 1,
+                 sks: 3,
+                 components: [
+                     { name: 'Tugas', weight: 25, score: 80 },
+                     { name: 'Kuis', weight: 25, score: 75 },
+                     { name: 'UTS', weight: 25, score: 70 },
+                     { name: 'UAS', weight: 25, score: 85 }
+                 ],
+                 addComponent() {
+                     this.components.push({ name: '', weight: 0, score: 0 });
+                 },
+                 removeComponent(index) {
+                     if (this.components.length > 1) {
+                         this.components.splice(index, 1);
+                     }
+                 },
+                 resetComponents() {
+                     this.components = [
+                         { name: 'Tugas', weight: 25, score: 80 },
+                         { name: 'Kuis', weight: 25, score: 75 },
+                         { name: 'UTS', weight: 25, score: 70 },
+                         { name: 'UAS', weight: 25, score: 85 }
+                     ];
+                 },
+                 get totalWeight() {
+                     return this.components.reduce((sum, item) => sum + (parseFloat(item.weight) || 0), 0);
+                 },
+                 get finalScore() {
+                     let total = this.totalWeight;
+                     if (total === 0) return 0;
+                     let weightedSum = this.components.reduce((sum, item) => {
+                         return sum + ((parseFloat(item.score) || 0) * (parseFloat(item.weight) || 0));
+                     }, 0);
+                     return Math.round((weightedSum / total) * 100) / 100;
+                 },
+                 get letterGrade() {
+                     let score = this.finalScore;
+                     if (score >= 80) return 'A';
+                     if (score >= 73) return 'AB';
+                     if (score >= 65) return 'B';
+                     if (score >= 58) return 'BC';
+                     if (score >= 50) return 'C';
+                     if (score >= 40) return 'D';
+                     return 'E';
+                 },
+                 get letterGradePoint() {
+                     let letter = this.letterGrade;
+                     switch(letter) {
+                         case 'A': return 4.0;
+                         case 'AB': return 3.5;
+                         case 'B': return 3.0;
+                         case 'BC': return 2.5;
+                         case 'C': return 2.0;
+                         case 'D': return 1.0;
+                         default: return 0.0;
+                     }
+                 },
+                 importToTracker() {
+                     $parent.modalSemester = this.semester;
+                     $parent.modalMataKuliah = this.mataKuliah || 'Kalkulator Nilai';
+                     $parent.modalSks = this.sks;
+                     $parent.modalNilai = this.letterGrade;
+                     $parent.showAddModal = true;
+                     $parent.activeTab = 'nilai';
+                     window.history.replaceState(null, null, '?tab=nilai');
+                 }
+             }">
+             
+             {{-- Title Section --}}
+             <div>
+                 <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Kalkulator Nilai Akhir</h1>
+                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Simulasikan nilai akhir mata kuliahmu dengan komponen penilaian kustom secara fleksibel.</p>
+             </div>
+
+             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                 {{-- Panel Kiri: Pengaturan Komponen --}}
+                 <div class="lg:col-span-2 space-y-6">
+                     <x-card class="p-6">
+                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                             <svg class="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                             </svg>
+                             Detail & Komponen Mata Kuliah
+                         </h3>
+                         
+                         {{-- Course Setup --}}
+                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                             <div>
+                                 <label class="mb-2 block text-xs font-semibold text-slate-500 dark:text-slate-400">Nama Mata Kuliah</label>
+                                 <x-input x-model="mataKuliah" placeholder="Contoh: Pengenalan Komputasi" />
+                             </div>
+                             <div>
+                                 <label class="mb-2 block text-xs font-semibold text-slate-500 dark:text-slate-400">Semester</label>
+                                 <x-select x-model.number="semester">
+                                     @for ($s = 1; $s <= 10; $s++)
+                                         <option value="{{ $s }}">Semester {{ $s }}</option>
+                                     @endfor
+                                 </x-select>
+                             </div>
+                             <div>
+                                 <label class="mb-2 block text-xs font-semibold text-slate-500 dark:text-slate-400">Jumlah SKS</label>
+                                 <x-select x-model.number="sks">
+                                     @for ($k = 1; $k <= 6; $k++)
+                                         <option value="{{ $k }}">{{ $k }} SKS</option>
+                                     @endfor
+                                 </x-select>
+                             </div>
+                         </div>
+
+                         <div class="border-t border-slate-100 dark:border-slate-700/60 pt-4">
+                             <div class="flex items-center justify-between mb-4">
+                                 <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300">Komponen Penilaian</h4>
+                                 <button type="button" @click="resetComponents()" class="inline-flex items-center text-xs font-semibold text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 transition">
+                                     Reset ke Default
+                                 </button>
+                             </div>
+
+                             <div class="space-y-3">
+                                 <template x-for="(component, index) in components" :key="index">
+                                     <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-100/50 dark:border-slate-700/30">
+                                         <div class="flex-grow">
+                                             <label class="sr-only">Nama Komponen</label>
+                                             <x-input x-model="component.name" placeholder="Nama Komponen (misal: Tugas)" class="py-2 px-3 text-xs" />
+                                         </div>
+                                         <div class="w-24">
+                                             <label class="sr-only">Bobot (%)</label>
+                                             <div class="relative">
+                                                 <x-input type="number" x-model.number="component.weight" placeholder="Bobot" min="0" max="100" class="py-2 pl-3 pr-6 text-xs" />
+                                                 <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">%</span>
+                                             </div>
+                                         </div>
+                                         <div class="w-28">
+                                             <label class="sr-only">Nilai (0-100)</label>
+                                             <x-input type="number" x-model.number="component.score" placeholder="Nilai" min="0" max="100" class="py-2 px-3 text-xs" />
+                                         </div>
+                                         <button type="button" @click="removeComponent(index)" :disabled="components.length <= 1" class="text-slate-400 hover:text-red-500 disabled:opacity-30 disabled:hover:text-slate-400 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                             </svg>
+                                         </button>
+                                     </div>
+                                 </template>
+                             </div>
+
+                             <div class="mt-4">
+                                 <x-button type="button" @click="addComponent()" variant="secondary" class="w-full text-xs py-2">
+                                     + Tambah Komponen
+                                 </x-button>
+                             </div>
+                         </div>
+                     </x-card>
+                 </div>
+
+                 {{-- Panel Kanan: Hasil & Ringkasan --}}
+                 <div class="space-y-6">
+                     <x-card class="bg-gradient-to-br from-slate-900 to-slate-950 dark:from-slate-800/80 dark:to-slate-900 text-white border-0 shadow-xl overflow-hidden relative">
+                         {{-- Background light flare --}}
+                         <div class="absolute -right-16 -top-16 h-36 w-36 rounded-full bg-pink-500/20 blur-3xl"></div>
+                         <div class="absolute -left-16 -bottom-16 h-36 w-36 rounded-full bg-blue-500/10 blur-3xl"></div>
+
+                         <div class="relative z-10 p-6 space-y-6 text-center">
+                             <div>
+                                 <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Hasil Perhitungan</p>
+                                 <h4 class="mt-1 text-lg font-extrabold text-white truncate" x-text="mataKuliah || 'Nama Mata Kuliah'"></h4>
+                                 <p class="text-xs text-slate-400" x-text="'Semester ' + semester + ' • ' + sks + ' SKS'"></p>
+                             </div>
+
+                             {{-- Big score indicator --}}
+                             <div class="flex flex-col items-center justify-center">
+                                 <div class="relative flex items-center justify-center h-32 w-32 rounded-full border-4 border-pink-500/30 bg-white/5 shadow-inner">
+                                     <div class="text-center">
+                                         <span class="text-3xl font-extrabold text-white" x-text="finalScore.toFixed(2)"></span>
+                                         <span class="block text-[10px] font-bold text-slate-400">NILAI AKHIR</span>
+                                     </div>
+                                 </div>
+                             </div>
+
+                             {{-- Letter Grade & Point --}}
+                             <div class="grid grid-cols-2 gap-4 border-t border-b border-white/10 py-4">
+                                 <div>
+                                     <span class="block text-[10px] font-semibold text-slate-400">GRADE</span>
+                                     <span class="inline-block mt-1 rounded-full bg-pink-500/20 px-3 py-0.5 text-sm font-extrabold text-pink-400 border border-pink-500/30" x-text="letterGrade"></span>
+                                 </div>
+                                 <div>
+                                     <span class="block text-[10px] font-semibold text-slate-400">BOBOT IPK</span>
+                                     <span class="block mt-1.5 text-base font-extrabold text-white" x-text="letterGradePoint.toFixed(1)"></span>
+                                 </div>
+                             </div>
+
+                             {{-- Weight Validation --}}
+                             <div class="space-y-2">
+                                 <div class="flex justify-between items-center text-xs">
+                                     <span class="font-medium text-slate-400">Total Bobot Komponen</span>
+                                     <span class="font-bold" :class="totalWeight === 100 ? 'text-emerald-400' : 'text-amber-400'" x-text="totalWeight + '% / 100%'"></span>
+                                 </div>
+                                 <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                     <div class="h-full rounded-full transition-all duration-300" 
+                                          :class="totalWeight === 100 ? 'bg-emerald-400' : 'bg-amber-400'" 
+                                          :style="'width: ' + Math.min(totalWeight, 100) + '%'"></div>
+                                 </div>
+                                 
+                                 <template x-if="totalWeight !== 100">
+                                     <p class="text-[10px] text-amber-300 bg-amber-950/40 border border-amber-900/30 p-2 rounded-xl text-left flex items-start gap-1.5 leading-normal">
+                                         <svg class="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                         </svg>
+                                         <span>Total bobot saat ini <span x-text="totalWeight"></span>%. Sesuaikan bobot komponen agar berjumlah tepat 100% untuk hasil yang akurat.</span>
+                                     </p>
+                                 </template>
+                                 <template x-if="totalWeight === 100">
+                                     <p class="text-[10px] text-emerald-300 bg-emerald-950/40 border border-emerald-900/30 p-2 rounded-xl text-left flex items-start gap-1.5 leading-normal">
+                                         <svg class="h-3.5 w-3.5 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                         </svg>
+                                         <span>Total bobot sudah pas 100%! Hasil perhitungan siap dimasukkan ke tracker.</span>
+                                     </p>
+                                 </template>
+                             </div>
+
+                             {{-- Action Button --}}
+                             <div class="pt-2">
+                                 <x-button type="button" 
+                                           @click="importToTracker()" 
+                                           ::disabled="totalWeight !== 100"
+                                           class="w-full bg-pink-600 hover:bg-pink-500 text-white focus:ring-pink-900 py-3 disabled:opacity-40 disabled:hover:bg-pink-600">
+                                     Masukkan ke Tracker Nilai
+                                 </x-button>
+                             </div>
+                         </div>
+                     </x-card>
+
+                     {{-- Grade Scale Table card --}}
+                     <x-card class="p-4">
+                         <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Skala Penilaian Standard</h4>
+                         <div class="overflow-hidden rounded-xl border border-slate-100 dark:border-slate-700/60">
+                             <table class="w-full text-left text-xs border-collapse">
+                                 <thead>
+                                     <tr class="bg-slate-50 dark:bg-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                                         <th class="px-3 py-1.5">Nilai Angka</th>
+                                         <th class="px-3 py-1.5 text-center">Grade</th>
+                                         <th class="px-3 py-1.5 text-right">Bobot IPK</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody class="divide-y divide-slate-50 dark:divide-slate-700/40 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-850">
+                                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
+                                         <td class="px-3 py-1.5">&ge; 80</td>
+                                         <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">A</td>
+                                         <td class="px-3 py-1.5 text-right font-semibold">4.0</td>
+                                     </tr>
+                                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
+                                         <td class="px-3 py-1.5">73 - 79.99</td>
+                                         <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">AB</td>
+                                         <td class="px-3 py-1.5 text-right font-semibold">3.5</td>
+                                     </tr>
+                                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
+                                         <td class="px-3 py-1.5">65 - 72.99</td>
+                                         <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">B</td>
+                                         <td class="px-3 py-1.5 text-right font-semibold">3.0</td>
+                                     </tr>
+                                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
+                                         <td class="px-3 py-1.5">58 - 64.99</td>
+                                         <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">BC</td>
+                                         <td class="px-3 py-1.5 text-right font-semibold">2.5</td>
+                                     </tr>
+                                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
+                                         <td class="px-3 py-1.5">50 - 57.99</td>
+                                         <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">C</td>
+                                         <td class="px-3 py-1.5 text-right font-semibold">2.0</td>
+                                     </tr>
+                                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
+                                         <td class="px-3 py-1.5">40 - 49.99</td>
+                                         <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">D</td>
+                                         <td class="px-3 py-1.5 text-right font-semibold">1.0</td>
+                                     </tr>
+                                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/25">
+                                         <td class="px-3 py-1.5">&lt; 40</td>
+                                         <td class="px-3 py-1.5 text-center font-bold text-pink-600 dark:text-pink-400">E</td>
+                                         <td class="px-3 py-1.5 text-right font-semibold">0.0</td>
+                                     </tr>
+                                 </tbody>
+                             </table>
+                         </div>
+                     </x-card>
+                 </div>
+             </div>
+        </div>
+
         {{-- Add Modal for Academic Grade --}}
         <div x-show="showAddModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4" style="display:none;">
             <div @click.away="showAddModal = false" class="w-full max-w-md rounded-3xl bg-white dark:bg-slate-800 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-transparent dark:border-slate-700">
@@ -338,7 +639,7 @@
                     
                     <div>
                         <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Semester</label>
-                        <x-select name="semester" required>
+                        <x-select name="semester" x-model.number="modalSemester" required>
                             @for ($s = 1; $s <= 10; $s++)
                                 <option value="{{ $s }}">Semester {{ $s }}</option>
                             @endfor
@@ -347,22 +648,22 @@
 
                     <div>
                         <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Nama Mata Kuliah</label>
-                        <x-input name="mata_kuliah" placeholder="Contoh: Algoritma & Struktur Data" required />
+                        <x-input name="mata_kuliah" x-model="modalMataKuliah" placeholder="Contoh: Algoritma & Struktur Data" required />
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Jumlah SKS</label>
-                            <x-select name="sks" required>
+                            <x-select name="sks" x-model.number="modalSks" required>
                                 @for ($k = 1; $k <= 6; $k++)
-                                    <option value="{{ $k }}" @selected($k === 3)>{{ $k }} SKS</option>
+                                    <option value="{{ $k }}">{{ $k }} SKS</option>
                                 @endfor
                             </x-select>
                         </div>
 
                         <div>
                             <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Nilai Huruf</label>
-                            <x-select name="nilai" required>
+                            <x-select name="nilai" x-model="modalNilai" required>
                                 <option value="A">A (4.0)</option>
                                 <option value="AB">AB (3.5)</option>
                                 <option value="B">B (3.0)</option>
