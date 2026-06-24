@@ -26,9 +26,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('dashboard')
-        : redirect()->route('login');
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return view('welcome');
 })->name('home');
 
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
