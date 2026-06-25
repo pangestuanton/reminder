@@ -5,7 +5,13 @@
         modalSemester: 1,
         modalMataKuliah: '',
         modalSks: 3,
-        modalNilai: 'A'
+        modalNilai: 'A',
+        showEditModal: false,
+        editGradeId: null,
+        editSemester: 1,
+        editMataKuliah: '',
+        editSks: 3,
+        editNilai: 'A'
     }" class="space-y-6">
         
         {{-- Header & Tab Section --}}
@@ -190,7 +196,19 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300 text-center font-medium">{{ number_format($grade->grade_point, 1) }}</td>
-                                            <td class="px-6 py-4 text-right">
+                                            <td class="px-6 py-4 text-right whitespace-nowrap space-x-2">
+                                                <button type="button" 
+                                                        @click="
+                                                            editGradeId = {{ $grade->id }};
+                                                            editSemester = {{ $grade->semester }};
+                                                            editMataKuliah = '{{ addslashes($grade->mata_kuliah) }}';
+                                                            editSks = {{ $grade->sks }};
+                                                            editNilai = '{{ $grade->nilai }}';
+                                                            showEditModal = true;
+                                                        "
+                                                        class="inline-flex items-center text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition mr-2">
+                                                    Edit
+                                                </button>
                                                 <x-modal message="Apakah Anda yakin ingin menghapus nilai mata kuliah ini?">
                                                     <x-slot:trigger>
                                                         <button type="button" class="inline-flex items-center text-xs font-semibold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition">Hapus</button>
@@ -678,6 +696,64 @@
                     <div class="mt-6 flex justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-700">
                         <button type="button" @click="showAddModal = false" class="inline-flex items-center justify-center rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700">Batal</button>
                         <x-button type="submit" class="bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600 focus:ring-pink-100">Simpan Nilai</x-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- Edit Modal for Academic Grade --}}
+        <div x-show="showEditModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4" style="display:none;">
+            <div @click.away="showEditModal = false" class="w-full max-w-md rounded-3xl bg-white dark:bg-slate-800 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-transparent dark:border-slate-700">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Ubah Nilai Mata Kuliah</h3>
+                    <button @click="showEditModal = false" class="text-slate-400 hover:text-slate-600 text-2xl font-semibold leading-none">&times;</button>
+                </div>
+
+                <form method="POST" :action="'{{ url('/akademik') }}/' + editGradeId" class="mt-4 space-y-4">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Semester</label>
+                        <x-select name="semester" x-model.number="editSemester" required>
+                            @for ($s = 1; $s <= 10; $s++)
+                                <option value="{{ $s }}">Semester {{ $s }}</option>
+                            @endfor
+                        </x-select>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Nama Mata Kuliah</label>
+                        <x-input name="mata_kuliah" x-model="editMataKuliah" placeholder="Contoh: Algoritma & Struktur Data" required />
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Jumlah SKS</label>
+                            <x-select name="sks" x-model.number="editSks" required>
+                                @for ($k = 1; $k <= 6; $k++)
+                                    <option value="{{ $k }}">{{ $k }} SKS</option>
+                                @endfor
+                            </x-select>
+                        </div>
+
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Nilai Huruf</label>
+                            <x-select name="nilai" x-model="editNilai" required>
+                                <option value="A">A (4.0)</option>
+                                <option value="AB">AB (3.5)</option>
+                                <option value="B">B (3.0)</option>
+                                <option value="BC">BC (2.5)</option>
+                                <option value="C">C (2.0)</option>
+                                <option value="D">D (1.0)</option>
+                                <option value="E">E (0.0)</option>
+                            </x-select>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-700">
+                        <button type="button" @click="showEditModal = false" class="inline-flex items-center justify-center rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700">Batal</button>
+                        <x-button type="submit" class="bg-pink-600 hover:bg-pink-700 dark:bg-pink-700 dark:hover:bg-pink-600 focus:ring-pink-100">Simpan Perubahan</x-button>
                     </div>
                 </form>
             </div>

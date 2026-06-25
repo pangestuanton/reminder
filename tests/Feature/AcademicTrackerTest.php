@@ -130,4 +130,62 @@ class AcademicTrackerTest extends TestCase
             'id' => $gradeA->id,
         ]);
     }
+
+    public function test_user_can_update_course_grade(): void
+    {
+        $user = User::factory()->create();
+        $grade = CourseGrade::create([
+            'user_id' => $user->id,
+            'semester' => 1,
+            'mata_kuliah' => 'Kimia Dasar',
+            'sks' => 3,
+            'nilai' => 'BC',
+        ]);
+
+        $response = $this->actingAs($user)->put(route('academic-tracker.update', $grade), [
+            'semester' => 2,
+            'mata_kuliah' => 'Kimia Dasar Lanjutan',
+            'sks' => 4,
+            'nilai' => 'A',
+        ]);
+
+        $response->assertRedirect(route('academic-tracker.index'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('course_grades', [
+            'id' => $grade->id,
+            'semester' => 2,
+            'mata_kuliah' => 'Kimia Dasar Lanjutan',
+            'sks' => 4,
+            'nilai' => 'A',
+        ]);
+    }
+
+    public function test_user_cannot_update_other_users_course_grade(): void
+    {
+        $userA = User::factory()->create();
+        $userB = User::factory()->create();
+
+        $gradeA = CourseGrade::create([
+            'user_id' => $userA->id,
+            'semester' => 1,
+            'mata_kuliah' => 'Fisika Dasar',
+            'sks' => 3,
+            'nilai' => 'A',
+        ]);
+
+        $response = $this->actingAs($userB)->put(route('academic-tracker.update', $gradeA), [
+            'semester' => 1,
+            'mata_kuliah' => 'Fisika Dasar',
+            'sks' => 3,
+            'nilai' => 'E',
+        ]);
+
+        $response->assertStatus(403);
+
+        $this->assertDatabaseHas('course_grades', [
+            'id' => $gradeA->id,
+            'nilai' => 'A',
+        ]);
+    }
 }

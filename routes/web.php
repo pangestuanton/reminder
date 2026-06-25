@@ -112,6 +112,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/akademik', [AcademicTrackerController::class, 'index'])->name('academic-tracker.index');
     Route::post('/akademik', [AcademicTrackerController::class, 'store'])->name('academic-tracker.store');
+    Route::put('/akademik/{courseGrade}', [AcademicTrackerController::class, 'update'])->name('academic-tracker.update');
     Route::delete('/akademik/{courseGrade}', [AcademicTrackerController::class, 'destroy'])->name('academic-tracker.destroy');
 
     Route::get('/integrations', function () {

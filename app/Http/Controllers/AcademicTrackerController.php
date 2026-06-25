@@ -146,6 +146,26 @@ class AcademicTrackerController extends Controller
         return redirect()->route('academic-tracker.index')->with('success', 'Nilai mata kuliah berhasil disimpan.');
     }
 
+    public function update(Request $request, CourseGrade $courseGrade): RedirectResponse
+    {
+        if ($courseGrade->user_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'semester' => 'required|integer|min:1|max:20',
+            'mata_kuliah' => 'required|string|max:255',
+            'sks' => 'required|integer|min:1|max:6',
+            'nilai' => 'required|string|in:A,AB,B,BC,C,D,E',
+        ]);
+
+        $validated['nilai'] = strtoupper($validated['nilai']);
+
+        $courseGrade->update($validated);
+
+        return redirect()->route('academic-tracker.index')->with('success', 'Nilai mata kuliah berhasil diperbarui.');
+    }
+
     public function destroy(CourseGrade $courseGrade, Request $request): RedirectResponse
     {
         if ($courseGrade->user_id !== $request->user()->id) {
